@@ -21,7 +21,7 @@ cd ..
 
 macOS / Linux：第一行改成 `python3.12 -m venv backend/.venv`，后端可执行文件使用 `backend/.venv/bin/python`。其余 npm 命令相同。
 
-复制 `backend/.env.example` 为 `backend/.env`、`frontend/.env.example` 为 `frontend/.env.local` 后按需配置。默认采集模式为 live；离线演示请使用下面的 fixture 参数。安装依赖、字体及浏览器需要联网。
+复制 `backend/.env.example` 为 `backend/.env`、`frontend/.env.example` 为 `frontend/.env.local` 后按需配置。默认采集模式为 live；离线演示请使用下面的 fixture 参数。安装依赖和浏览器需要联网；界面使用系统字体。
 
 ## 启动
 
