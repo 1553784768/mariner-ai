@@ -239,7 +239,7 @@ class AuditEvent(BaseModel):
     action: Literal["ORDERS_IMPORTED", "RUN_CREATED", "COLLECTED", "TRIAGED", "EXTRACTED", "VALIDATED",
                     "RULE_APPROVED", "RULE_REJECTED", "RULE_NEEDS_DETAIL", "BRIEF_PUBLISHED", "DECIDED",
                       "LLM_SETTINGS_CHANGED", "KB_EDITED", "KB_RESTORED", "KB_CREATED", "KB_DELETED",
-                      "CHAT_ORDER_DATA_SENT", "IMPORT_SENT_TO_MODEL"]
+                      "CHAT_ORDER_DATA_SENT", "IMPORT_SENT_TO_MODEL", "CHAT_DELETED", "KB_UNDELETED"]
     entity: str
     summary: str
     prev_hash: str

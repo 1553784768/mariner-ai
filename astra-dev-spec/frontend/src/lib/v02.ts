@@ -1,6 +1,8 @@
 export interface KnowledgeEntry {
   id: string;
   source_type: string;
+  deleted: boolean;
+  deleted_at: string | null;
   title: string;
   snippet: string;
   title_zh: string;
@@ -21,6 +23,8 @@ export interface KnowledgeEntry {
 }
 export interface ChatMessage {
   id: string;
+  error: boolean;
+  created_at: string;
   role: "user" | "assistant";
   text: string;
   citations: { id: string; title: string }[];
@@ -29,6 +33,7 @@ export interface ChatMessage {
 }
 export interface Conversation {
   id: string;
+  created_at?: string;
   messages: ChatMessage[];
 }
 export interface ImportJob {
@@ -42,4 +47,12 @@ export interface ImportJob {
   model: string | null;
   notes_zh: string | null;
   notes_en: string | null;
+}
+
+export interface ConversationSummary {
+  id: string;
+  title: string;
+  created_at: string;
+  updated_at: string;
+  message_count: number;
 }

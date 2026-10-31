@@ -47,6 +47,7 @@ def save_settings(body: s.LlmSettingsRequest, session=Depends(session_dep), sett
         record = LlmSettings(id="local", business_date=str(settings.today), payload=payload)
         session.add(record)
     append(session, str(settings.today), "LLM_SETTINGS_CHANGED", "本地用户", "llm_settings", f"模型配置已保存：{body.model}")
+    session.commit()
     return public_settings(record)
 
 
@@ -56,6 +57,7 @@ def clear_settings(session=Depends(session_dep), settings=Depends(settings_dep))
     if record:
         session.delete(record)
     append(session, str(settings.today), "LLM_SETTINGS_CHANGED", "本地用户", "llm_settings", "模型配置已清除")
+    session.commit()
     return public_settings(None)
 
 
@@ -77,4 +79,5 @@ def test_settings(lang: Literal["zh", "en"] = "zh", session=Depends(session_dep)
     latency = round((time.monotonic() - start) * 1000, 2)
     value = dict(ok=ok, message=message, latency_ms=latency)
     record.payload = {**record.payload, "last_test": {**value, "at": now()}}
+    session.commit()
     return {**value, "message": translate(message) if lang == "en" else message}

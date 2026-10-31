@@ -81,6 +81,7 @@ def review(draft_id: str, body: s.ReviewRequest, session=Depends(session_dep), s
         append(session, str(settings.today), action, "本地用户", draft_id, summary)
     from app.knowledge.service import sync_kb
     sync_kb(session, settings)
+    session.commit()
     return record.payload
 
 

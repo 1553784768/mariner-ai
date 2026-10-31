@@ -88,7 +88,7 @@ test("workbench policy and order answers show citations and numeric guard", asyn
   await page.goto("/");
   await expect(page.locator(".sidebar nav a").first()).toContainText("工作台");
   await expect(page.getByRole("checkbox", { name: "对话可使用订单数据" })).not.toBeChecked();
-  await page.getByRole("button", { name: "新对话", exact: true }).click();
+  await page.getByRole("button", { name: "+ 新对话", exact: true }).click();
   const input = page.getByPlaceholder("输入问题，或上传订单文件…");
   await input.fill("今天有哪些需要关注的政策？");
   await input.press("Enter");
@@ -112,7 +112,7 @@ test("workbench policy and order answers show citations and numeric guard", asyn
 
 test("image import requires consent, validates edits, and imports two orders", async ({ page }) => {
   await page.goto("/");
-  await page.getByRole("button", { name: "新对话", exact: true }).click();
+  await page.getByRole("button", { name: "+ 新对话", exact: true }).click();
   await page
     .locator('input[type="file"]')
     .setInputFiles(resolve(__dirname, "../../backend/fixtures/import/order_sheet_sample.png"));

@@ -59,6 +59,8 @@ AUDIT_TEMPLATES = [
     ("{id} · 编辑知识", "{id} · Knowledge edited"),
     ("{id} · 恢复知识", "{id} · Knowledge restored"),
     ("{id} · 新建知识", "{id} · Knowledge created"),
+    ("{id} · 删除对话", "{id} · Delete chat"),
+    ("{id} · 恢复删除", "{id} · Restore knowledge"),
     ("{id} · 删除知识", "{id} · Knowledge deleted"),
     ("对话向模型 {model} 发送订单数据：{ids}", "Chat sent order data to model {model}: {ids}"),
     ("文件 {name} 已发送给模型 {model}", "File {name} sent to model {model}"),

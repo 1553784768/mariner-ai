@@ -4,14 +4,15 @@ Mariner AI：把美国关税政策变化换算成每笔订单利润变化的本�
 
 ## 文档
 
-- v0.2 改动与任务：`docs/V02_SPEC.md`、`docs/TASKS_V02.md`、`docs/engine_text_templates.json`（当前开发阶段先读这三份）
+- v0.2.1 修复与任务：`docs/V021_SPEC.md`、`docs/TASKS_V021.md`（当前开发阶段先读）
+- v0.2 改动与任务：`docs/V02_SPEC.md`、`docs/TASKS_V02.md`、`docs/engine_text_templates.json`
 - v0.1 任务与验收：`docs/TASKS.md`
 - 架构、目录、依赖、环境变量、数据流、业务规则：`docs/SPEC.md`
 - 视觉、布局、组件、文案、Logo：`docs/DESIGN.md`、`design/tokens.css`、`design/reference/approva-reference.html`、`design/logo/`
 - 接口与数据结构：`docs/API.md`
 - 智能体、模型调用、校验：`docs/AI_PIPELINE.md`
 
-文档冲突时按此优先级取值：V02_SPEC > SPEC > API > AI_PIPELINE > DESIGN > TASKS_V02 > TASKS，并在回复中注明冲突位置。
+文档冲突时按此优先级取值：V021_SPEC > V02_SPEC > SPEC > API > AI_PIPELINE > DESIGN > TASKS_V021 > TASKS_V02 > TASKS，并在回复中注明冲突位置。
 
 ## 不确定的事不自主决策
 
@@ -75,9 +76,9 @@ npx playwright test
 
 ## 完成定义
 
-- 满足当前阶段任务文件（v0.2 为 `docs/TASKS_V02.md`）中该任务的全部验收标准。
+- 满足当前阶段任务文件（v0.2.1 为 `docs/TASKS_V021.md`）中该任务的全部验收标准。
 - 按改动所在一侧运行检查：后端 `ruff check` + `pytest`；前端 `lint` + `typecheck`；涉及 E2E 的任务再跑 `playwright`。检查通过后，没有新改动就不重复测试，也不扩大测试范围。
 - 界面任务：在 1440×900 下截图，存为 `artifacts/screenshots/<任务ID>.png`；同一任务需要多张时，命名为 `<任务ID>-<宽度或状态>.png`。回复中附上路径。
 - 在当前阶段任务文件中把该任务状态改为 `DONE（日期）`，并写一行说明。
 - 按 TASKS 的顺序推进。任务被部分阻塞时，先做完其余部分，再继续下一个任务。
-- 回复用中文。代码、注释、提交信息用英文。中文界面文案只用 `docs/DESIGN.md`、`docs/API.md`、`docs/V02_SPEC.md` 中写出的字符串；英文文案按 `docs/V02_SPEC.md` §7.6 的术语表翻译，并汇总到 `docs/i18n-review.md`。
+- 回复用中文。代码、注释、提交信息用英文。中文界面文案只用 `docs/DESIGN.md`、`docs/API.md`、`docs/V02_SPEC.md`、`docs/V021_SPEC.md` 中写出的字符串；英文文案优先按 `docs/V021_SPEC.md` §7，其余按 `docs/V02_SPEC.md` §7.6 的术语表翻译，并汇总到 `docs/i18n-review.md`。

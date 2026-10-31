@@ -451,7 +451,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/chat/conversations": {
+    "/api/kb/{key}/undelete": {
         parameters: {
             query?: never;
             header?: never;
@@ -459,6 +459,24 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
+        put?: never;
+        /** Undelete */
+        post: operations["undelete_api_kb__key__undelete_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/chat/conversations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Listing */
+        get: operations["listing_api_chat_conversations_get"];
         put?: never;
         /** Create */
         post: operations["create_api_chat_conversations_post"];
@@ -480,6 +498,24 @@ export interface paths {
         put?: never;
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/chat/conversations/{key}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Detail */
+        get: operations["detail_api_chat_conversations__key__get"];
+        put?: never;
+        post?: never;
+        /** Delete */
+        delete: operations["delete_api_chat_conversations__key__delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -665,7 +701,7 @@ export interface components {
              * Action
              * @enum {string}
              */
-            action: "ORDERS_IMPORTED" | "RUN_CREATED" | "COLLECTED" | "TRIAGED" | "EXTRACTED" | "VALIDATED" | "RULE_APPROVED" | "RULE_REJECTED" | "RULE_NEEDS_DETAIL" | "BRIEF_PUBLISHED" | "DECIDED" | "LLM_SETTINGS_CHANGED" | "KB_EDITED" | "KB_RESTORED" | "KB_CREATED" | "KB_DELETED" | "CHAT_ORDER_DATA_SENT" | "IMPORT_SENT_TO_MODEL";
+            action: "ORDERS_IMPORTED" | "RUN_CREATED" | "COLLECTED" | "TRIAGED" | "EXTRACTED" | "VALIDATED" | "RULE_APPROVED" | "RULE_REJECTED" | "RULE_NEEDS_DETAIL" | "BRIEF_PUBLISHED" | "DECIDED" | "LLM_SETTINGS_CHANGED" | "KB_EDITED" | "KB_RESTORED" | "KB_CREATED" | "KB_DELETED" | "CHAT_ORDER_DATA_SENT" | "IMPORT_SENT_TO_MODEL" | "CHAT_DELETED" | "KB_UNDELETED";
             /** Entity */
             entity: string;
             /** Summary */
@@ -2327,6 +2363,7 @@ export interface operations {
                 include_sensitive?: boolean;
                 limit?: number;
                 offset?: number;
+                deleted?: boolean;
             };
             header?: never;
             path?: never;
@@ -2519,6 +2556,69 @@ export interface operations {
             };
         };
     };
+    undelete_api_kb__key__undelete_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    listing_api_chat_conversations_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+                lang?: "zh" | "en";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     create_api_chat_conversations_post: {
         parameters: {
             query?: never;
@@ -2555,6 +2655,68 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+        };
+    };
+    detail_api_chat_conversations__key__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    delete_api_chat_conversations__key__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
                 };
             };
         };

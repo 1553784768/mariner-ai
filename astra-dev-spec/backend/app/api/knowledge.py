@@ -9,7 +9,7 @@ from app.api.errors import ApiException
 from app.api.routes import missing, session_dep, settings_dep
 from app.audit.service import append
 from app.db.models import KbEntry
-from app.knowledge.service import index_entry, search
+from app.knowledge.service import index_entry, search, sync_kb
 from app.settings import now
 
 router = APIRouter(prefix="/api/kb")
@@ -42,11 +42,11 @@ def get_entry(session, key):
 
 @router.get("")
 def entries(type: str | None = None, q: str = "", lang: Lang = "zh", include_sensitive: bool = False,
-            limit: int = Query(50, ge=1, le=200), offset: int = Query(0, ge=0), session=Depends(session_dep)):
+            limit: int = Query(50, ge=1, le=200), offset: int = Query(0, ge=0), deleted: bool = False, session=Depends(session_dep), settings=Depends(settings_dep)):
     return [dict(id=v["id"], source_type=v["source_type"], title=v["title_"+lang], snippet=v["body_"+lang][:120],
                  sensitive=v["sensitive"], editable=v["editable"], edited=v["edited_"+lang],
-                 source_changed=v["source_changed"], updated_at=v["updated_at"])
-            for v in search(session, q, type, include_sensitive, limit, offset)]
+                 source_changed=v["source_changed"], updated_at=v["updated_at"], deleted=v.get("deleted", False), deleted_at=v.get("deleted_at"))
+            for v in search(session, q, type, include_sensitive, limit, offset, deleted=deleted, settings=settings)]
 
 
 @router.post("")
@@ -55,17 +55,18 @@ def create(body: Create, session=Depends(session_dep), settings=Depends(settings
         raise ApiException(400, "BAD_REQUEST", "请求参数不合法")
     value = dict(id=f"manual:{uuid4()}", source_type="manual", sensitive=False, editable=True,
                  **body.model_dump(), edited_zh=bool(body.title_zh), edited_en=bool(body.title_en), source_changed=False,
-                 created_at=now(), updated_at=now(), business_date=str(settings.today),
+                 created_at=now(), updated_at=now(), business_date=str(settings.today), deleted=False, deleted_at=None,
                  auto_title_zh=None, auto_body_zh=None, auto_title_en=None, auto_body_en=None)
     session.add(KbEntry(id=value["id"], business_date=str(settings.today), payload=value))
     index_entry(session, value)
     append(session, str(settings.today), "KB_CREATED", "本地用户", value["id"], f'{value["id"]} · 新建知识')
+    session.commit()
     return value
 
 
 @router.get("/{key}")
 def detail(key: str, session=Depends(session_dep)):
-    return get_entry(session, key).payload
+    return {"deleted": False, "deleted_at": None, **get_entry(session, key).payload}
 
 
 @router.put("/{key}")
@@ -79,6 +80,7 @@ def edit(key: str, body: Edit, session=Depends(session_dep), settings=Depends(se
                       "edited_"+body.lang: True, "source_changed": False, "updated_at": now()}
     index_entry(session, record.payload)
     append(session, str(settings.today), "KB_EDITED", "本地用户", key, f"{key} · 编辑知识")
+    session.commit()
     return record.payload
 
 
@@ -95,15 +97,29 @@ def restore(key: str, body: Restore, session=Depends(session_dep), settings=Depe
     record.payload = v
     index_entry(session, v)
     append(session, str(settings.today), "KB_RESTORED", "本地用户", key, f"{key} · 恢复知识")
+    session.commit()
     return v
 
 
 @router.delete("/{key}")
 def delete(key: str, session=Depends(session_dep), settings=Depends(settings_dep)):
     record = get_entry(session, key)
-    if record.payload["source_type"] != "manual":
-        raise ApiException(409, "CONFLICT", "系统生成的条目不能删除")
-    session.delete(record)
+    if record.payload["source_type"] == "manual":
+        session.delete(record)
+    else:
+        record.payload = {**record.payload, "deleted": True, "deleted_at": now()}
     session.execute(text("DELETE FROM kb_fts WHERE id=:id"), {"id": key})
     append(session, str(settings.today), "KB_DELETED", "本地用户", key, f"{key} · 删除知识")
+    session.commit()
     return {"deleted": True}
+
+
+@router.post("/{key}/undelete")
+def undelete(key: str, session=Depends(session_dep), settings=Depends(settings_dep)):
+    record = get_entry(session, key)
+    record.payload = {**record.payload, "deleted": False, "deleted_at": None}
+    sync_kb(session, settings, only=key)
+    index_entry(session, record.payload)
+    append(session, str(settings.today), "KB_UNDELETED", "本地用户", key, f"{key} · 恢复删除")
+    session.commit()
+    return record.payload

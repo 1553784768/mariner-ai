@@ -1,288 +1,295 @@
-# v0.2 英文文案审阅清单
+# v0.2.1 英文文案审阅清单
 
 生成日期：2026-10-31。全部条目均为实现中的当前文案，供用户审阅；生成清单不等于人工批准译文。
 
-术语依据 `V02_SPEC.md` §7.6。`{...}` 为运行时参数，金额、日期、税率保持原值。以下覆盖 `frontend/src/i18n/en.ts` 的全部键值，以及后端引擎、错误、审计、知识库、日报和内置双语内容。原文标题、来源正文、产品名称、文件名、用户输入、旧记录缺失译文的原文按规格保留；API 字段名、枚举 key、日志和模型提示词属于技术内容，不作为界面译文列入。种子及夹具中的关税事件是项目演示快照，本清单没有独立核实其现实有效性。
+术语优先依据 `V021_SPEC.md` §7，其余依据 `V02_SPEC.md` §7.6。`{...}` 为运行时参数，金额、日期、税率保持原值。以下覆盖 `frontend/src/i18n/en.ts` 的全部键值，以及后端引擎、错误、审计、知识库、日报和内置双语内容。原文标题、来源正文、产品名称、文件名、用户输入、旧记录缺失译文的原文按规格保留；API 字段名、枚举 key、日志和模型提示词属于技术内容，不作为界面译文列入。种子及夹具中的关税事件是项目演示快照，本清单没有独立核实其现实有效性。
 
 重新生成：`backend/.venv/Scripts/python.exe scripts/generate_i18n_review.py`（Linux 使用对应 venv Python；需要已安装前端依赖）。
 
 
-## 前端字典（272 项，完整）
+## 前端字典（279 项，完整）
 
 | 编号 / 来源 | 中文 | English |
 |---|---|---|
-| UI-001 | 规则快照 | Rule snapshot |
-| UI-002 | 、 | ,  |
-| UI-003 | 第 {p0} 条 | Actions {p0} |
-| UI-004 | 「{filename}」的内容将发送给已配置的模型 {model}{endpoint}用于识别订单。文件可能包含客户、价格和成本信息。 | The contents of “{filename}” will be sent to the configured model {model}{endpoint} to recognize orders. The file may contain customer, price and cost information. |
-| UI-005 | 文件过大（上限 10 MB） | File too large (10 MB limit) |
-| UI-006 | 工作台 | Workbench |
-| UI-007 | 新对话 | New Conversation |
-| UI-008 | 未配置模型：只能回答内置示例问题。 | No model configured: only built-in example questions are available. |
-| UI-009 | 去配置 → | Configure → |
-| UI-010 | 引用 | Sources |
-| UI-011 | 回答中有知识库里找不到的数字： | Numbers not found in the knowledge base:  |
-| UI-012 | ，请以订单影响单为准 | . Refer to the Order Impact Sheet. |
-| UI-013 | 思考中… | Thinking… |
-| UI-014 | 对话可使用订单数据 | Allow order data in chat |
-| UI-015 | 开启后，检索到的订单和影响单内容会发送给模型 | When enabled, retrieved orders and impact sheets are sent to model  |
-| UI-016 | 内置夹具 | Built-in fixtures |
-| UI-017 | 输入问题，或上传订单文件… | Ask a question, or upload an order file… |
-| UI-018 | 发送 | Send |
-| UI-019 | 风险收件箱 | Risk Inbox |
-| UI-020 | 待处理 | Pending |
-| UI-021 | 红 | Red |
-| UI-022 | 紧急 | Urgent |
-| UI-023 | 风险收件箱 → | Risk Inbox → |
-| UI-024 | 政策日报 | Policy Brief |
-| UI-025 | 查看日报 → | View Brief → |
-| UI-026 | 导入订单 CSV | Import Orders CSV |
-| UI-027 | 选择文件 | Choose File |
-| UI-028 | 第 | Row  |
-| UI-029 | 行 · |  ·  |
-| UI-030 | 已导入 | Imported  |
-| UI-031 | 行，更新 |  rows, updated  |
-| UI-032 | 行 |  rows |
-| UI-033 | 上传 | Upload |
-| UI-034 | 取消 | Cancel |
-| UI-035 | 识别中… | Recognizing… |
-| UI-036 | 发送文件给模型？ | Send file to the model? |
-| UI-037 | 」的内容将发送给已配置的模型 |  will be sent to the configured model  |
-| UI-038 | 用于识别订单。文件可能包含客户、价格和成本信息。 |  to recognize orders. The file may include customer, price and cost information. |
-| UI-039 | 发送并识别 | Send and Recognize |
-| UI-040 | 未配置模型，无法识别该文件。可改用 CSV 模板导入。 | No model configured. This file cannot be recognized. Use the CSV template instead. |
-| UI-041 | 显示全部字段 | Show All Fields |
-| UI-042 | 确认导入 | Confirm Import |
-| UI-043 | 知识库 | Knowledge Base |
-| UI-044 | 规则审核 | Rule Review |
-| UI-045 | 智能体流水线 | Agent Pipeline |
-| UI-046 | 模型接入 | Model Access |
-| UI-047 | 已接入 | Connected |
-| UI-048 | 未接入 | Not connected |
-| UI-049 | 工作区 | Workspace |
-| UI-050 | 本 | L |
-| UI-051 | 本地用户 | Local user |
-| UI-052 | 中 | 中 |
-| UI-053 | 红色 | Red |
-| UI-054 | 北京时间 | Beijing Time  |
-| UI-055 | · 计算批次 | · Calculation run  |
-| UI-056 | v0.2 · 税则 | v0.2 · HTS  |
-| UI-057 | 人 | You |
-| UI-058 | 已入境 | Entered |
-| UI-059 | 规则边界 {p0}天 | Rule boundary in {p0} days |
-| UI-060 | 已过入境日 | Entry date passed |
-| UI-061 | 入境 {p0}天 | Entry in {p0} days |
-| UI-062 | 利润变化 · USD | Profit Change · USD |
-| UI-063 | · 预计入境 | · Expected entry  |
-| UI-064 | 利好 | Favorable |
-| UI-065 | 电商 | E-commerce |
-| UI-066 | 进口商 | Importer of record  |
-| UI-067 | 卖方 | Seller |
-| UI-068 | 买方 | Buyer |
-| UI-069 | 搜索订单号、品名、HS 编码… | Search order ID, product, HS code… |
-| UI-070 | 今日已处理 | Processed Today |
-| UI-071 | 单 |  orders |
-| UI-072 | 加载中… | Loading… |
-| UI-073 | 重试 | Retry |
-| UI-074 | 层 | Layer |
-| UI-075 | 第99章税号 | Chapter 99 heading |
-| UI-076 | 税率 | Rate |
-| UI-077 | 关税额 | Duty |
-| UI-078 | 基准关税（ | Baseline Duty ( |
-| UI-079 | 新关税 | New Duty |
-| UI-080 | 关税增量 | Duty Change |
-| UI-081 | 基准 | Baseline |
-| UI-082 | 重算 | Recalculated |
-| UI-083 | 变化 | Change |
-| UI-084 | 收入 | Revenue |
-| UI-085 | 卖方成本 | Seller Cost |
-| UI-086 | 利润 | Profit |
-| UI-087 | 毛利率 | Margin |
-| UI-088 | 可执行建议 | Recommended Actions |
-| UI-089 | 处理链 | Processing Chain |
-| UI-090 | 报关行复核（含未核实字段时） | Broker review (when unverified fields exist) |
-| UI-091 | 规则核验 | Rule Checks |
-| UI-092 | 订单影响单 | Order Impact Sheet |
-| UI-093 | 进口商： | Importer of record:  |
-| UI-094 | 品名与税号 | Product and HTS |
-| UI-095 | 贸易术语 | Incoterm |
-| UI-096 | 无关税条款 | No tariff clause |
-| UI-097 | 关税增量我方承担 {p0}% | Seller bears {p0}% of duty increase |
-| UI-098 | 关键日期 | Key Dates |
-| UI-099 | 装船日 | Load date  |
-| UI-100 | 预计入境日 | Expected entry  |
-| UI-101 | 已采纳：第 | Adopted: actions  |
-| UI-102 | 条 |   |
-| UI-103 | 补充说明： | Detail note:  |
-| UI-104 | 本工具不构成法律或报关意见；税号归类与最终税额以进口商/报关行申报为准。 | This tool does not provide legal or customs advice. HTS classification and final duty are subject to the importer’s or customs broker’s declaration. |
-| UI-105 | 审计日志 | Audit Log |
-| UI-106 | 不可篡改 · SHA-256 链式 | Tamper-evident · SHA-256 chain |
-| UI-107 | 最近处理 | Recent Decisions |
-| UI-108 | 订单号 | Order ID |
-| UI-109 | 品名 | Product |
-| UI-110 | 利润变化 | Profit Change |
-| UI-111 | 处理人 | Actor |
-| UI-112 | 时间 | Time |
-| UI-113 | 状态印章 | Status Stamp |
-| UI-114 | 说明 | Details |
-| UI-115 | 已采纳：第 {p0} 条 | Adopted: actions {p0} |
-| UI-116 | 触发 | Trigger |
-| UI-117 | 采集 | Collect |
-| UI-118 | 人工确认 · {p0} 待确认 | Human review · {p0} pending |
-| UI-119 | 人工确认 | Human Review |
-| UI-120 | 计算 | Calculate |
-| UI-121 | 日报 | Brief |
-| UI-122 | 完成 | Completed |
-| UI-123 | 临界事件 | Critical Events |
-| UI-124 | 影响 {p0} 单 · {p1} | Affects {p0} orders · {p1} |
-| UI-125 | 暂无受影响订单 | No affected orders |
-| UI-126 | 服务器内部错误 | Internal server error |
-| UI-127 | 已采纳 | Adopted |
-| UI-128 | 不处理 | Dismiss |
-| UI-129 | 需补充 | Needs Detail |
-| UI-130 | 规则已人工确认 | Rules manually approved |
-| UI-131 | 原文引用命中 | Source quote matched |
-| UI-132 | 税号存在 | HTS code exists |
-| UI-133 | 基准税率一致 | Baseline rate matches |
-| UI-134 | 未核实字段 | Unverified fields |
-| UI-135 | 原文引用逐字命中 | Source quote matches verbatim |
-| UI-136 | 字段均有引用 | All fields have citations |
-| UI-137 | 日期合理 | Dates are reasonable |
-| UI-138 | 税率范围 | Rate range |
-| UI-139 | 第99章税号存在 | Chapter 99 heading exists |
-| UI-140 | 目标税号存在 | Target HTS code exists |
-| UI-141 | 与已确认规则冲突 | Conflicts with approved rules |
-| UI-142 | 新增措施字段完整 | New program fields complete |
-| UI-143 | 排除到期日必填 | Exclusion expiry required |
-| UI-144 | 通过 | Pass |
-| UI-145 | 注意 | Attention |
-| UI-146 | 不通过 | Fail |
-| UI-147 | 不适用 | Not applicable |
-| UI-148 | 等待 | Waiting |
-| UI-149 | 运行中 | Running |
-| UI-150 | 失败 | Failed |
-| UI-151 | 部分完成 | Partially completed |
-| UI-152 | 无夹具跳过 | Skipped: no fixture |
-| UI-153 | 联邦公报采集 | Federal Register Collector |
-| UI-154 | 公开预览采集 | Public Inspection Collector |
-| UI-155 | 税则版本检查 | HTS Version Check |
-| UI-156 | 政策采集 | Policy Collection |
-| UI-157 | 分诊 | Triage |
-| UI-158 | 抽取 | Extract |
-| UI-159 | 校验 | Validate |
-| UI-160 | 计算引擎 | Calculation Engine |
-| UI-161 | 你（待决定） | You (decision pending) |
-| UI-162 | 已生效 | In force |
-| UI-163 | 已签署待生效 | Signed, pending |
-| UI-164 | 按期到期 | Scheduled expiry |
-| UI-165 | 拟议 | Proposed |
-| UI-166 | 调查中 | Under investigation |
-| UI-167 | 谈判中（无税率） | In negotiation (no rate) |
-| UI-168 | 法院裁决 | Court ruling |
-| UI-169 | 程序性 | Procedural |
-| UI-170 | 待确认 | Pending approval |
-| UI-171 | 已确认 | Approved |
-| UI-172 | 已驳回 | Rejected |
-| UI-173 | 新增措施 | Add Program |
-| UI-174 | 修改措施 | Update Program |
-| UI-175 | 修改税号规则 | Update HTS Rule |
-| UI-176 | 观察项 | Watch Item |
-| UI-177 | 无税率变化 | No rate change |
-| UI-178 | 编辑知识 | Edit Knowledge |
-| UI-179 | 恢复知识 | Restore Knowledge |
-| UI-180 | 新建知识 | Create Knowledge |
-| UI-181 | 删除知识 | Delete Knowledge |
-| UI-182 | 对话外发订单 | Order Data Sent in Chat |
-| UI-183 | 文件外发识别 | File Sent for Recognition |
-| UI-184 | 导入 | Import |
-| UI-185 | 确认规则 | Approve Rule |
-| UI-186 | 驳回规则 | Reject Rule |
-| UI-187 | 规则需补充 | Rule Needs Detail |
-| UI-188 | 决策 | Decision |
-| UI-189 | 模型配置 | Model Configuration |
-| UI-190 | 政策 | Policy |
-| UI-191 | 到期 | Expiry |
-| UI-192 | 观察 | Watch |
-| UI-193 | 预警（尚未正式发布） | Alert (not yet published) |
-| UI-194 | 还没有日报 | No brief yet |
-| UI-195 | 日期 | Date |
-| UI-196 | 美国关税政策日报 · | U.S. Tariff Policy Brief ·  |
-| UI-197 | 待读全文 | Full text pending |
-| UI-198 | 原文标题： | Original title:  |
-| UI-199 | 受影响订单 · | Affected orders ·  |
-| UI-200 | 原文 ↗ | Source ↗ |
-| UI-201 | 订单总数 | Total Orders |
-| UI-202 | 橙 | Orange |
-| UI-203 | 黄 | Yellow |
-| UI-204 | 绿 | Green |
-| UI-205 | 合计利润变化 | Total Profit Change |
-| UI-206 | 潜在退款 | Potential Refund |
-| UI-207 | 订单风险收件箱 | Order Risk Inbox |
-| UI-208 | + 导入订单 | + Import Orders |
-| UI-209 | 全部 | All |
-| UI-210 | 非 DDP | Non-DDP |
-| UI-211 | 重新计算 | Recalculate |
-| UI-212 | 排序：预计入境 最近优先 ↓ | Sort: expected entry, earliest first ↓ |
-| UI-213 | 暂无订单，请先导入 CSV | No orders. Import a CSV first. |
-| UI-214 | 采纳建议（ | Adopt ( |
-| UI-215 | 先勾选要采纳的建议 | Select the actions to adopt first |
-| UI-216 | 补充说明（必填） | Detail note (required) |
-| UI-217 | 提交 | Submit |
-| UI-218 | + 新建条目 | + New Entry |
-| UI-219 | 搜索知识库… | Search knowledge base… |
-| UI-220 | 规则 | Rule |
-| UI-221 | 订单 | Order |
-| UI-222 | 影响单 | Impact Sheet |
-| UI-223 | 手动 | Manual |
-| UI-224 | 显示订单数据 | Show Order Data |
-| UI-225 | 暂无条目 | No entries |
-| UI-226 | 已编辑 | Edited |
-| UI-227 | 来源已更新 | Source Updated |
-| UI-228 | 只读 | Read Only |
-| UI-229 | 来源已更新，当前显示的是你编辑过的版本 | The source has changed. Your edited version is shown. |
-| UI-230 | 查看系统版本 | View System Version |
-| UI-231 | 恢复 | Restore |
-| UI-232 | 标题 | Title |
-| UI-233 | 正文 | Body |
-| UI-234 | 保存 | Save |
-| UI-235 | 编辑 | Edit |
-| UI-236 | 恢复系统版本 | Restore System Version |
-| UI-237 | 确定删除这条知识吗？ | Delete this knowledge entry? |
-| UI-238 | 删除 | Delete |
-| UI-239 | 系统生成，只读 | System generated, read only |
-| UI-240 | 立即运行 | Run Now |
-| UI-241 | 每日 07:30 | Daily at 07:30 |
-| UI-242 | 智能体 | Agent |
-| UI-243 | 状态 | Status |
-| UI-244 | 输入 | Input |
-| UI-245 | 输出 | Output |
-| UI-246 | 跳过 | Skipped |
-| UI-247 | 错误 | Errors |
-| UI-248 | 耗时 | Duration |
-| UI-249 | 暂无待确认的规则草稿 | No rule drafts pending approval |
-| UI-250 | 预估影响 · USD | Estimated Impact · USD |
-| UI-251 | 原文 | Source Text |
-| UI-252 | 驳回 | Reject |
-| UI-253 | 校验结果 | Validation Results |
-| UI-254 | 未接入（使用内置夹具） | Not connected (using built-in fixtures) |
-| UI-255 | 接口地址 | Base URL |
-| UI-256 | 例如 https://api.example.com/v1 | e.g. https://api.example.com/v1 |
-| UI-257 | 已保存 | Saved  |
-| UI-258 | ，留空则不修改 | . Leave blank to keep unchanged. |
-| UI-259 | 模型名称 | Model Name |
-| UI-260 | 填写服务商提供的模型 ID | Enter the model ID from your provider |
-| UI-261 | 测试连接 | Test Connection |
-| UI-262 | 清除配置 | Clear Configuration |
-| UI-263 | 连接成功 | Connected successfully |
-| UI-264 | 连接失败：{p0} | Connection failed: {p0} |
-| UI-265 | 接口需兼容 OpenAI Chat Completions 格式（POST | The API must support OpenAI Chat Completions (POST  |
-| UI-266 | {接口地址} | {Base URL} |
-| UI-267 | /chat/completions）。未配置时，智能体使用内置夹具。 | /chat/completions). Agents use built-in fixtures when not configured. |
-| UI-268 | Archivo · 订单风险收件箱 | Archivo · Order Risk Inbox |
-| UI-269 | Hanken Grotesk · 风险收件箱 | Hanken Grotesk · Risk Inbox |
-| UI-270 | Space Mono · 2026-10-31 · 中文 | Space Mono · 2026-10-31 · Chinese |
-| UI-271 | 请求参数不合法 | Invalid request parameters |
-| UI-272 | 采纳建议（{n}） | Adopt ({n}) |
+| UI-001 | 删除对话 | Delete chat |
+| UI-002 | 删除后，这条内容不再出现在知识库列表和对话中，可在「已删除」中恢复。不影响订单、规则和关税计算。确定删除吗？ | After deletion this entry no longer appears in the knowledge base list or in chat. You can restore it from "Deleted". Orders, rules and duty calculations are not affected. Delete it? |
+| UI-003 | 已删除 | Deleted |
+| UI-004 | 确定删除这段对话吗？ | Delete this conversation? |
+| UI-005 | 还没有对话 | No conversations yet |
+| UI-006 | + 新对话 | + New chat |
+| UI-007 | 对话记录 | Conversations |
+| UI-008 | 规则快照 | Rule snapshot |
+| UI-009 | 、 | ,  |
+| UI-010 | 第 {p0} 条 | Actions {p0} |
+| UI-011 | 「{filename}」的内容将发送给已配置的模型 {model}{endpoint}用于识别订单。文件可能包含客户、价格和成本信息。 | The contents of “{filename}” will be sent to the configured model {model}{endpoint} to recognize orders. The file may contain customer, price and cost information. |
+| UI-012 | 文件过大（上限 10 MB） | File too large (10 MB limit) |
+| UI-013 | 工作台 | Workbench |
+| UI-014 | 新对话 | New chat |
+| UI-015 | 未配置模型：只能回答内置示例问题。 | No model configured: only built-in example questions are available. |
+| UI-016 | 去配置 → | Configure → |
+| UI-017 | 引用 | Sources |
+| UI-018 | 回答中有知识库里找不到的数字： | Numbers not found in the knowledge base:  |
+| UI-019 | ，请以订单影响单为准 | . Refer to the Order Impact Sheet. |
+| UI-020 | 思考中… | Thinking… |
+| UI-021 | 对话可使用订单数据 | Allow order data in chat |
+| UI-022 | 开启后，检索到的订单和影响单内容会发送给模型 | When enabled, retrieved orders and impact sheets are sent to model  |
+| UI-023 | 内置夹具 | Built-in fixtures |
+| UI-024 | 输入问题，或上传订单文件… | Ask a question, or upload an order file… |
+| UI-025 | 发送 | Send |
+| UI-026 | 风险收件箱 | Risk Inbox |
+| UI-027 | 待处理 | Pending |
+| UI-028 | 红 | Red |
+| UI-029 | 紧急 | Urgent |
+| UI-030 | 风险收件箱 → | Risk Inbox → |
+| UI-031 | 政策日报 | Policy Brief |
+| UI-032 | 查看日报 → | View Brief → |
+| UI-033 | 导入订单 CSV | Import Orders CSV |
+| UI-034 | 选择文件 | Choose File |
+| UI-035 | 第 | Row  |
+| UI-036 | 行 · |  ·  |
+| UI-037 | 已导入 | Imported  |
+| UI-038 | 行，更新 |  rows, updated  |
+| UI-039 | 行 |  rows |
+| UI-040 | 上传 | Upload |
+| UI-041 | 取消 | Cancel |
+| UI-042 | 识别中… | Recognizing… |
+| UI-043 | 发送文件给模型？ | Send file to the model? |
+| UI-044 | 」的内容将发送给已配置的模型 |  will be sent to the configured model  |
+| UI-045 | 用于识别订单。文件可能包含客户、价格和成本信息。 |  to recognize orders. The file may include customer, price and cost information. |
+| UI-046 | 发送并识别 | Send and Recognize |
+| UI-047 | 未配置模型，无法识别该文件。可改用 CSV 模板导入。 | No model configured. This file cannot be recognized. Use the CSV template instead. |
+| UI-048 | 显示全部字段 | Show All Fields |
+| UI-049 | 确认导入 | Confirm Import |
+| UI-050 | 知识库 | Knowledge Base |
+| UI-051 | 规则审核 | Rule Review |
+| UI-052 | 智能体流水线 | Agent Pipeline |
+| UI-053 | 模型接入 | Model Access |
+| UI-054 | 已接入 | Connected |
+| UI-055 | 未接入 | Not connected |
+| UI-056 | 工作区 | Workspace |
+| UI-057 | 本 | L |
+| UI-058 | 本地用户 | Local user |
+| UI-059 | 中 | 中 |
+| UI-060 | 红色 | Red |
+| UI-061 | 北京时间 | Beijing Time  |
+| UI-062 | · 计算批次 | · Calculation run  |
+| UI-063 | v0.2.1 · 税则 | v0.2.1 · HTS  |
+| UI-064 | 人 | You |
+| UI-065 | 已入境 | Entered |
+| UI-066 | 规则边界 {p0}天 | Rule boundary in {p0} days |
+| UI-067 | 已过入境日 | Entry date passed |
+| UI-068 | 入境 {p0}天 | Entry in {p0} days |
+| UI-069 | 利润变化 · USD | Profit Change · USD |
+| UI-070 | · 预计入境 | · Expected entry  |
+| UI-071 | 利好 | Favorable |
+| UI-072 | 电商 | E-commerce |
+| UI-073 | 进口商 | Importer of record  |
+| UI-074 | 卖方 | Seller |
+| UI-075 | 买方 | Buyer |
+| UI-076 | 搜索订单号、品名、HS 编码… | Search order ID, product, HS code… |
+| UI-077 | 今日已处理 | Processed Today |
+| UI-078 | 单 |  orders |
+| UI-079 | 加载中… | Loading… |
+| UI-080 | 重试 | Retry |
+| UI-081 | 层 | Layer |
+| UI-082 | 第99章税号 | Chapter 99 heading |
+| UI-083 | 税率 | Rate |
+| UI-084 | 关税额 | Duty |
+| UI-085 | 基准关税（ | Baseline Duty ( |
+| UI-086 | 新关税 | New Duty |
+| UI-087 | 关税增量 | Duty Change |
+| UI-088 | 基准 | Baseline |
+| UI-089 | 重算 | Recalculated |
+| UI-090 | 变化 | Change |
+| UI-091 | 收入 | Revenue |
+| UI-092 | 卖方成本 | Seller Cost |
+| UI-093 | 利润 | Profit |
+| UI-094 | 毛利率 | Margin |
+| UI-095 | 可执行建议 | Recommended Actions |
+| UI-096 | 处理链 | Processing Chain |
+| UI-097 | 报关行复核（含未核实字段时） | Broker review (when unverified fields exist) |
+| UI-098 | 规则核验 | Rule Checks |
+| UI-099 | 订单影响单 | Order Impact Sheet |
+| UI-100 | 进口商： | Importer of record:  |
+| UI-101 | 品名与税号 | Product and HTS |
+| UI-102 | 贸易术语 | Incoterm |
+| UI-103 | 无关税条款 | No tariff clause |
+| UI-104 | 关税增量我方承担 {p0}% | Seller bears {p0}% of duty increase |
+| UI-105 | 关键日期 | Key Dates |
+| UI-106 | 装船日 | Load date  |
+| UI-107 | 预计入境日 | Expected entry  |
+| UI-108 | 已采纳：第 | Adopted: actions  |
+| UI-109 | 条 |   |
+| UI-110 | 补充说明： | Detail note:  |
+| UI-111 | 本工具不构成法律或报关意见；税号归类与最终税额以进口商/报关行申报为准。 | This tool does not provide legal or customs advice. HTS classification and final duty are subject to the importer’s or customs broker’s declaration. |
+| UI-112 | 审计日志 | Audit Log |
+| UI-113 | 不可篡改 · SHA-256 链式 | Tamper-evident · SHA-256 chain |
+| UI-114 | 最近处理 | Recent Decisions |
+| UI-115 | 订单号 | Order ID |
+| UI-116 | 品名 | Product |
+| UI-117 | 利润变化 | Profit Change |
+| UI-118 | 处理人 | Actor |
+| UI-119 | 时间 | Time |
+| UI-120 | 状态印章 | Status Stamp |
+| UI-121 | 说明 | Details |
+| UI-122 | 已采纳：第 {p0} 条 | Adopted: actions {p0} |
+| UI-123 | 触发 | Trigger |
+| UI-124 | 采集 | Collect |
+| UI-125 | 人工确认 · {p0} 待确认 | Human review · {p0} pending |
+| UI-126 | 人工确认 | Human Review |
+| UI-127 | 计算 | Calculate |
+| UI-128 | 日报 | Brief |
+| UI-129 | 完成 | Completed |
+| UI-130 | 临界事件 | Critical Events |
+| UI-131 | 影响 {p0} 单 · {p1} | Affects {p0} orders · {p1} |
+| UI-132 | 暂无受影响订单 | No affected orders |
+| UI-133 | 服务器内部错误 | Internal server error |
+| UI-134 | 已采纳 | Adopted |
+| UI-135 | 不处理 | Dismiss |
+| UI-136 | 需补充 | Needs Detail |
+| UI-137 | 规则已人工确认 | Rules manually approved |
+| UI-138 | 原文引用命中 | Source quote matched |
+| UI-139 | 税号存在 | HTS code exists |
+| UI-140 | 基准税率一致 | Baseline rate matches |
+| UI-141 | 未核实字段 | Unverified fields |
+| UI-142 | 原文引用逐字命中 | Source quote matches verbatim |
+| UI-143 | 字段均有引用 | All fields have citations |
+| UI-144 | 日期合理 | Dates are reasonable |
+| UI-145 | 税率范围 | Rate range |
+| UI-146 | 第99章税号存在 | Chapter 99 heading exists |
+| UI-147 | 目标税号存在 | Target HTS code exists |
+| UI-148 | 与已确认规则冲突 | Conflicts with approved rules |
+| UI-149 | 新增措施字段完整 | New program fields complete |
+| UI-150 | 排除到期日必填 | Exclusion expiry required |
+| UI-151 | 通过 | Pass |
+| UI-152 | 注意 | Attention |
+| UI-153 | 不通过 | Fail |
+| UI-154 | 不适用 | Not applicable |
+| UI-155 | 等待 | Waiting |
+| UI-156 | 运行中 | Running |
+| UI-157 | 失败 | Failed |
+| UI-158 | 部分完成 | Partially completed |
+| UI-159 | 无夹具跳过 | Skipped: no fixture |
+| UI-160 | 联邦公报采集 | Federal Register Collector |
+| UI-161 | 公开预览采集 | Public Inspection Collector |
+| UI-162 | 税则版本检查 | HTS Version Check |
+| UI-163 | 政策采集 | Policy Collection |
+| UI-164 | 分诊 | Triage |
+| UI-165 | 抽取 | Extract |
+| UI-166 | 校验 | Validate |
+| UI-167 | 计算引擎 | Calculation Engine |
+| UI-168 | 你（待决定） | You (decision pending) |
+| UI-169 | 已生效 | In force |
+| UI-170 | 已签署待生效 | Signed, pending |
+| UI-171 | 按期到期 | Scheduled expiry |
+| UI-172 | 拟议 | Proposed |
+| UI-173 | 调查中 | Under investigation |
+| UI-174 | 谈判中（无税率） | In negotiation (no rate) |
+| UI-175 | 法院裁决 | Court ruling |
+| UI-176 | 程序性 | Procedural |
+| UI-177 | 待确认 | Pending approval |
+| UI-178 | 已确认 | Approved |
+| UI-179 | 已驳回 | Rejected |
+| UI-180 | 新增措施 | Add Program |
+| UI-181 | 修改措施 | Update Program |
+| UI-182 | 修改税号规则 | Update HTS Rule |
+| UI-183 | 观察项 | Watch Item |
+| UI-184 | 无税率变化 | No rate change |
+| UI-185 | 编辑知识 | Edit Knowledge |
+| UI-186 | 恢复知识 | Restore knowledge |
+| UI-187 | 新建知识 | Create Knowledge |
+| UI-188 | 删除知识 | Delete Knowledge |
+| UI-189 | 对话外发订单 | Order Data Sent in Chat |
+| UI-190 | 文件外发识别 | File Sent for Recognition |
+| UI-191 | 导入 | Import |
+| UI-192 | 确认规则 | Approve Rule |
+| UI-193 | 驳回规则 | Reject Rule |
+| UI-194 | 规则需补充 | Rule Needs Detail |
+| UI-195 | 决策 | Decision |
+| UI-196 | 模型配置 | Model Configuration |
+| UI-197 | 政策 | Policy |
+| UI-198 | 到期 | Expiry |
+| UI-199 | 观察 | Watch |
+| UI-200 | 预警（尚未正式发布） | Alert (not yet published) |
+| UI-201 | 还没有日报 | No brief yet |
+| UI-202 | 日期 | Date |
+| UI-203 | 美国关税政策日报 · | U.S. Tariff Policy Brief ·  |
+| UI-204 | 待读全文 | Full text pending |
+| UI-205 | 原文标题： | Original title:  |
+| UI-206 | 受影响订单 · | Affected orders ·  |
+| UI-207 | 原文 ↗ | Source ↗ |
+| UI-208 | 订单总数 | Total Orders |
+| UI-209 | 橙 | Orange |
+| UI-210 | 黄 | Yellow |
+| UI-211 | 绿 | Green |
+| UI-212 | 合计利润变化 | Total Profit Change |
+| UI-213 | 潜在退款 | Potential Refund |
+| UI-214 | 订单风险收件箱 | Order Risk Inbox |
+| UI-215 | + 导入订单 | + Import Orders |
+| UI-216 | 全部 | All |
+| UI-217 | 非 DDP | Non-DDP |
+| UI-218 | 重新计算 | Recalculate |
+| UI-219 | 排序：预计入境 最近优先 ↓ | Sort: expected entry, earliest first ↓ |
+| UI-220 | 暂无订单，请先导入 CSV | No orders. Import a CSV first. |
+| UI-221 | 采纳建议（ | Adopt ( |
+| UI-222 | 先勾选要采纳的建议 | Select the actions to adopt first |
+| UI-223 | 补充说明（必填） | Detail note (required) |
+| UI-224 | 提交 | Submit |
+| UI-225 | + 新建条目 | + New Entry |
+| UI-226 | 搜索知识库… | Search knowledge base… |
+| UI-227 | 规则 | Rule |
+| UI-228 | 订单 | Order |
+| UI-229 | 影响单 | Impact Sheet |
+| UI-230 | 手动 | Manual |
+| UI-231 | 显示订单数据 | Show Order Data |
+| UI-232 | 暂无条目 | No entries |
+| UI-233 | 已编辑 | Edited |
+| UI-234 | 来源已更新 | Source Updated |
+| UI-235 | 只读 | Read Only |
+| UI-236 | 来源已更新，当前显示的是你编辑过的版本 | The source has changed. Your edited version is shown. |
+| UI-237 | 查看系统版本 | View System Version |
+| UI-238 | 恢复 | Restore |
+| UI-239 | 标题 | Title |
+| UI-240 | 正文 | Body |
+| UI-241 | 保存 | Save |
+| UI-242 | 编辑 | Edit |
+| UI-243 | 恢复系统版本 | Restore System Version |
+| UI-244 | 确定删除这条知识吗？ | Delete this knowledge entry? |
+| UI-245 | 删除 | Delete |
+| UI-246 | 系统生成，只读 | System generated, read only |
+| UI-247 | 立即运行 | Run Now |
+| UI-248 | 每日 07:30 | Daily at 07:30 |
+| UI-249 | 智能体 | Agent |
+| UI-250 | 状态 | Status |
+| UI-251 | 输入 | Input |
+| UI-252 | 输出 | Output |
+| UI-253 | 跳过 | Skipped |
+| UI-254 | 错误 | Errors |
+| UI-255 | 耗时 | Duration |
+| UI-256 | 暂无待确认的规则草稿 | No rule drafts pending approval |
+| UI-257 | 预估影响 · USD | Estimated Impact · USD |
+| UI-258 | 原文 | Source Text |
+| UI-259 | 驳回 | Reject |
+| UI-260 | 校验结果 | Validation Results |
+| UI-261 | 未接入（使用内置夹具） | Not connected (using built-in fixtures) |
+| UI-262 | 接口地址 | Base URL |
+| UI-263 | 例如 https://api.example.com/v1 | e.g. https://api.example.com/v1 |
+| UI-264 | 已保存 | Saved  |
+| UI-265 | ，留空则不修改 | . Leave blank to keep unchanged. |
+| UI-266 | 模型名称 | Model Name |
+| UI-267 | 填写服务商提供的模型 ID | Enter the model ID from your provider |
+| UI-268 | 测试连接 | Test Connection |
+| UI-269 | 清除配置 | Clear Configuration |
+| UI-270 | 连接成功 | Connected successfully |
+| UI-271 | 连接失败：{p0} | Connection failed: {p0} |
+| UI-272 | 接口需兼容 OpenAI Chat Completions 格式（POST | The API must support OpenAI Chat Completions (POST  |
+| UI-273 | {接口地址} | {Base URL} |
+| UI-274 | /chat/completions）。未配置时，智能体使用内置夹具。 | /chat/completions). Agents use built-in fixtures when not configured. |
+| UI-275 | Archivo · 订单风险收件箱 | Archivo · Order Risk Inbox |
+| UI-276 | Hanken Grotesk · 风险收件箱 | Hanken Grotesk · Risk Inbox |
+| UI-277 | Space Mono · 2026-10-31 · 中文 | Space Mono · 2026-10-31 · Chinese |
+| UI-278 | 请求参数不合法 | Invalid request parameters |
+| UI-279 | 采纳建议（{n}） | Adopt ({n}) |
 
 
 ## 引擎模板（docs/engine_text_templates.json，完整）
@@ -423,14 +430,16 @@
 | audit/12 | {id} · 编辑知识 | {id} · Knowledge edited |
 | audit/13 | {id} · 恢复知识 | {id} · Knowledge restored |
 | audit/14 | {id} · 新建知识 | {id} · Knowledge created |
-| audit/15 | {id} · 删除知识 | {id} · Knowledge deleted |
-| audit/16 | 对话向模型 {model} 发送订单数据：{ids} | Chat sent order data to model {model}: {ids} |
-| audit/17 | 文件 {name} 已发送给模型 {model} | File {name} sent to model {model} |
-| audit/18 | 模型配置已保存：{model} | Model settings saved: {model} |
-| audit/19 | 模型配置已清除 | Model settings cleared |
-| audit/20 | 确认 {id} · {outcome} | Approved {id} · {outcome} |
-| audit/21 | 驳回 {id} | Rejected {id} |
-| audit/22 | {id} 需补充 | {id} needs detail |
+| audit/15 | {id} · 删除对话 | {id} · Delete chat |
+| audit/16 | {id} · 恢复删除 | {id} · Restore knowledge |
+| audit/17 | {id} · 删除知识 | {id} · Knowledge deleted |
+| audit/18 | 对话向模型 {model} 发送订单数据：{ids} | Chat sent order data to model {model}: {ids} |
+| audit/19 | 文件 {name} 已发送给模型 {model} | File {name} sent to model {model} |
+| audit/20 | 模型配置已保存：{model} | Model settings saved: {model} |
+| audit/21 | 模型配置已清除 | Model settings cleared |
+| audit/22 | 确认 {id} · {outcome} | Approved {id} · {outcome} |
+| audit/23 | 驳回 {id} | Rejected {id} |
+| audit/24 | {id} 需补充 | {id} needs detail |
 | audit parameter | 内置夹具 | Built-in fixtures |
 | audit parameter | 不影响现有订单 | No effect on current orders |
 | audit parameter | 更新观察项 | Watch item updated |

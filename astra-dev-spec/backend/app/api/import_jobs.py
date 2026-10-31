@@ -166,8 +166,10 @@ def create(file: UploadFile = File(...), conversation_id: str = Form(...),
     upload_text = f"上传文件：{filename}"
     if lang == "en":
         upload_text, reply = translate(upload_text), translate(reply)
-    return dict(job=localized_job(value, lang), messages=[message(session, settings, conversation_id, "user", upload_text),
+    response = dict(job=localized_job(value, lang), messages=[message(session, settings, conversation_id, "user", upload_text),
                 message(session, settings, conversation_id, "assistant", reply, import_job_id=key)])
+    session.commit()
+    return response
 
 
 @router.get("/{key}")
@@ -213,6 +215,7 @@ def consent(key: str, lang: Literal["zh", "en"] = "zh", session=Depends(session_
         from app.localization import translate
         v.update(status="failed", notes_zh=str(exc), notes_en=translate(str(exc)))
     record.payload = v
+    session.commit()
     return localized_job(v, lang)
 
 
@@ -221,6 +224,7 @@ def edit(key: str, body: Rows, lang: Literal["zh", "en"] = "zh", session=Depends
     record = get_job(session, key)
     mutable(record, ("parsed",))
     record.payload = {**record.payload, "rows": body.rows, "errors": validate_rows(body.rows, session, record.payload["kind"])}
+    session.commit()
     return localized_job(record.payload, lang)
 
 
@@ -246,6 +250,7 @@ def commit(key: str, session=Depends(session_dep), settings=Depends(settings_dep
     run = create_run(session, settings)
     record.payload = {**record.payload, "status": "imported"}
     record.content = None
+    session.commit()
     return dict(imported=imported, updated=updated, run_id=run.id, errors=[])
 
 
@@ -255,4 +260,5 @@ def cancel(key: str, session=Depends(session_dep)):
     mutable(record, ("needs_consent", "parsed", "failed"))
     record.payload = {**record.payload, "status": "cancelled"}
     record.content = None
+    session.commit()
     return record.payload

@@ -27,7 +27,7 @@ function Knowledge() {
     queryKey: ["kb", type, query, sensitive, lang],
     queryFn: () =>
       api<KnowledgeEntry[]>(
-        `/kb?type=${type}&q=${encodeURIComponent(query)}&include_sensitive=${sensitive}&limit=200`,
+        `/kb?type=${type === "deleted" ? "" : type}&deleted=${type === "deleted"}&q=${encodeURIComponent(query)}&include_sensitive=${sensitive}&limit=200`,
       ),
   });
   const id = params.get("id") || entries.data?.[0]?.id;
@@ -50,10 +50,14 @@ function Knowledge() {
           method: "POST",
           body: JSON.stringify({ [`title_${lang}`]: title, [`body_${lang}`]: body }),
         });
-      return api<KnowledgeEntry>(`/kb/${encodeURIComponent(id!)}${action === "restore" ? "/restore" : ""}`, {
-        method: action === "delete" ? "DELETE" : action === "restore" ? "POST" : "PUT",
-        ...(action !== "delete" ? { body: JSON.stringify({ lang, title, body }) } : {}),
-      });
+      return api<KnowledgeEntry>(
+        `/kb/${encodeURIComponent(id!)}${action === "undelete" ? "/undelete" : action === "restore" ? "/restore" : ""}`,
+        {
+          method:
+            action === "delete" ? "DELETE" : action === "restore" || action === "undelete" ? "POST" : "PUT",
+          ...(action !== "delete" ? { body: JSON.stringify({ lang, title, body }) } : {}),
+        },
+      );
     },
     onSuccess: (result, action) => {
       setEditing(false);
@@ -94,6 +98,7 @@ function Knowledge() {
               ["order", t("订单")],
               ["impact", t("影响单")],
               ["manual", t("手动")],
+              ["deleted", t("已删除")],
             ].map(([key, label]) => (
               <button
                 className={`filter-button ${type === key ? "active" : ""}`}
@@ -146,6 +151,14 @@ function Knowledge() {
           {detail.error && !creating && <ErrorBanner error={detail.error} />}
           {(creating || value) && (
             <article className="paper-document brut-lg">
+              {value?.deleted && !creating && (
+                <div className="source-banner tone-warn-soft brut-sm" data-testid="deleted-banner">
+                  {t("已删除")}
+                  <button disabled={mutation.isPending} onClick={() => mutation.mutate("undelete")}>
+                    {t("恢复")}
+                  </button>
+                </div>
+              )}
               {value?.source_changed && !creating && (
                 <div className="source-banner tone-warn-soft brut-sm">
                   {t("来源已更新，当前显示的是你编辑过的版本")}
@@ -203,21 +216,25 @@ function Knowledge() {
               ) : (
                 value && (
                   <>
-                    <h2>{value[`title_${lang}`] || value.title_zh}</h2>
+                    <div className="section-heading">
+                      <h2>{value[`title_${lang}`] || value.title_zh}</h2>
+                      <button
+                        disabled={mutation.isPending}
+                        className="secondary-button brut-sm text-bad"
+                        onClick={() => {
+                          const question =
+                            value.source_type === "manual"
+                              ? "确定删除这条知识吗？"
+                              : "删除后，这条内容不再出现在知识库列表和对话中，可在「已删除」中恢复。不影响订单、规则和关税计算。确定删除吗？";
+                          if (confirm(t(question))) mutation.mutate("delete");
+                        }}
+                      >
+                        {t("删除")}
+                      </button>
+                    </div>
                     <div className="tags">
                       <Tag>{typeLabel(value.source_type)}</Tag>
                       <time className="label-mono">{formatTime(value.updated_at)}</time>
-                      {value.source_type === "manual" && (
-                        <button
-                          disabled={mutation.isPending}
-                          className="secondary-button brut-sm text-bad"
-                          onClick={() => {
-                            if (confirm(t("确定删除这条知识吗？"))) mutation.mutate("delete");
-                          }}
-                        >
-                          {t("删除")}
-                        </button>
-                      )}
                     </div>
                     <p className="knowledge-body">{value[`body_${lang}`] || value.body_zh}</p>
                     {system && (

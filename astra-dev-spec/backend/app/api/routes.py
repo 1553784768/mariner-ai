@@ -17,8 +17,13 @@ router = APIRouter(prefix="/api")
 
 
 def session_dep(request: Request):
-    with request.app.state.factory.begin() as session:
-        yield session
+    with request.app.state.factory() as session:
+        try:
+            yield session
+            session.commit()
+        except Exception:
+            session.rollback()
+            raise
 
 
 def settings_dep(request: Request):
@@ -67,12 +72,15 @@ def import_orders(file: UploadFile = File(...), session=Depends(session_dep), se
     append(session, str(settings.today), "ORDERS_IMPORTED", "本地用户", "orders", f"导入 {imported} 行，更新 {updated} 行")
     session.flush()
     run = create_run(session, settings)
+    session.commit()
     return dict(imported=imported, updated=updated, run_id=run.id, errors=[])
 
 
 @router.post("/runs", response_model=s.ImpactRun)
 def new_run(session=Depends(session_dep), settings=Depends(settings_dep)):
-    return create_run(session, settings).payload
+    run = create_run(session, settings)
+    session.commit()
+    return run.payload
 
 
 @router.get("/runs/latest", response_model=s.ImpactRun)
@@ -138,6 +146,7 @@ def decide(order_id: str, body: s.DecisionRequest, session=Depends(session_dep),
     value = dict(order_id=order_id, run_id=run.id, decision=body.decision, note=note, adopted_actions=adopted, decided_at=timestamp,
                  actor="本地用户", audit_hash=event["hash"], product=item.payload["product"], profit_delta_usd=item.payload["profit_delta_usd"])
     session.add(m.Decision(id=uuid4().hex, business_date=str(settings.today), payload=value))
+    session.commit()
     return value
 
 

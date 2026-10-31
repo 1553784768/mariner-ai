@@ -53,7 +53,7 @@ export function BrandBlock({ release = "—" }: { release?: string }) {
       <div>
         <strong className="font-display">Mariner AI</strong>
         <p className="label-mono">
-          {t("v0.2 · 税则")}
+          {t("v0.2.1 · 税则")}
           {release}
         </p>
       </div>

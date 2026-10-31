@@ -78,6 +78,8 @@ export const auditLabels: Record<string, string> = localized({
   KB_RESTORED: "恢复知识",
   KB_CREATED: "新建知识",
   KB_DELETED: "删除知识",
+  KB_UNDELETED: "恢复知识",
+  CHAT_DELETED: "删除对话",
   CHAT_ORDER_DATA_SENT: "对话外发订单",
   IMPORT_SENT_TO_MODEL: "文件外发识别",
   ORDERS_IMPORTED: "导入",
