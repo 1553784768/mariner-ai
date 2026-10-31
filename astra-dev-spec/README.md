@@ -79,3 +79,8 @@ backend/.venv/Scripts/python scripts/live_smoke.py
 Linux/macOS 使用 `backend/.venv/bin/python`。脚本调用本地服务，创建流水线和一段不含订单数据的问答，逐项报告 health、模型连接、流水线、采集器、数字守卫。该操作会写入本地业务记录；模型与采集步骤在 live 模式下会访问已配置服务。失败项使脚本返回退出码 1。
 
 在全新 fixture 数据库且未配置模型时，预期第 1、3、4、5 项 PASS，第 2 项 FAIL（未配置模型）。fixture 流水线可为 partial，因为部分文件有意不提供模型夹具；第三项只要求非 failed 且 triage 无错误。此结果不代表真实模型和线上政策服务已通过联调。
+
+
+## 许可证
+
+项目采用 [MIT 许可证](../LICENSE)。
