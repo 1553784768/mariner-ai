@@ -1,0 +1,594 @@
+<!--
+  Reference snapshot for design fidelity only. Do NOT ship this file.
+  Source: https://agent.kombai.com/kombai-inspiration-library/app-pages/dashboards/web/18/index.html
+  Gallery page: https://kombai.com/gallery/inspirations/dashboards-web-18/  (Kombai "Approva", Reference ID kombai:import-screen:dashboards-web-18)
+  Fetched: 2026-10-31. Brand "STAMPLY", people, vendors and amounts below are the template's sample content.
+  Abridged: two of the five request cards in the queue were removed (EXP-9918, EXP-9914); they use the identical card structure. Apart from that, only whitespace, one JS comment and the HTML-escaping of "&" differ from the fetched file.
+-->
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  </head>
+  <body>
+    <style>
+@import url('https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Hanken+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+@import url('https://cdn.jsdelivr.net/npm/@tabler/icons-webfont/tabler-icons.min.css');
+
+body { font-family: 'Hanken Grotesk', sans-serif; background:#CFE8D6; color:#121210; }
+.font-display { font-family: 'Archivo', sans-serif; letter-spacing:-0.01em; }
+.font-mono { font-family: 'Space Mono', monospace; font-variant-numeric: tabular-nums; }
+.brut { border: 3px solid #121210; box-shadow: 4px 4px 0 #121210; }
+.brut-lg { border: 3px solid #121210; box-shadow: 6px 6px 0 #121210; }
+.brut-sm { border: 2px solid #121210; box-shadow: 3px 3px 0 #121210; }
+.brut-card { border: 3px solid #121210; box-shadow: 4px 4px 0 #121210; background:#FFFFFF; }
+.brut-card:hover { transform: translate(-2px,-2px); box-shadow: 8px 8px 0 #121210; }
+.btn-press:active { transform: translate(4px,4px); box-shadow: 0 0 0 #121210 !important; }
+.stripes-amber { background-image: repeating-linear-gradient(45deg, #F4D89A, #F4D89A 12px, #E8A030 12px, #E8A030 14px); }
+.grid-paper { background-image: linear-gradient(rgba(18,18,16,0.08) 1px,transparent 1px),linear-gradient(90deg,rgba(18,18,16,0.08) 1px,transparent 1px); background-size: 24px 24px; }
+.polka { background-image: radial-gradient(circle,#121210 1.5px,transparent 1.5px); background-size: 20px 20px; }
+.tab-active { background:#121210; color:#FFFFFF; }
+.nav-item:hover { transform: translate(-1px,-1px); box-shadow: 5px 5px 0 #121210; }
+
+/* Stamp */
+.stamp {
+  font-family: 'Archivo', sans-serif;
+  font-weight: 700;
+  border: 4px solid currentColor;
+  padding: 10px 22px;
+  letter-spacing: 0.15em;
+  display: inline-block;
+  border-radius: 4px;
+  position: relative;
+}
+.stamp::before, .stamp::after {
+  content:""; position:absolute; inset:4px; border: 2px solid currentColor; border-radius:2px; opacity:.6;
+}
+.stamp::after { inset:-2px; border:2px dashed currentColor; opacity:.35; }
+
+/* Keep every history column readable inside the document pane. */
+.history-table { table-layout:fixed; }
+.history-table th, .history-table td { padding:10px 6px; overflow-wrap:anywhere; }
+.history-table th { font-size:10px; letter-spacing:.06em; }
+.history-table td { font-size:12px; }
+.history-table .stamp { padding:6px 4px; border-width:2px; font-size:9px; letter-spacing:.06em; white-space:normal; text-align:center; max-width:100%; }
+.req-card > .flex:first-of-type { gap:12px; }
+.req-card > .flex:first-of-type > div:first-child { min-width:0; }
+.req-card > .flex:first-of-type > div:last-child { flex-shrink:0; }
+@media (max-width:1350px) {
+  .document-layout { flex-direction:column; }
+  .document-layout > #invoice { width:100%; flex:none; }
+  .document-actions { position:static; width:100%; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+  .document-actions > * { margin:0; }
+  .document-actions > div { grid-column:1 / -1; }
+  .document-actions .stamp-btn { padding:14px 6px; font-size:12px; letter-spacing:.05em; min-width:0; }
+}
+
+.big-stamp {
+  position:absolute;
+  font-family:'Archivo',sans-serif;
+  font-weight:700;
+  font-size:64px;
+  letter-spacing:0.12em;
+  border: 8px solid currentColor;
+  padding: 16px 36px;
+  border-radius: 6px;
+  opacity: 0.88;
+  pointer-events:none;
+}
+
+.tag { display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border:2px solid #121210; font-weight:600; font-size:11px; letter-spacing:0.06em; text-transform:uppercase; }
+
+.chain-node { width:28px; height:28px; border:2px solid #121210; border-radius:999px; display:inline-flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; }
+.chain-line { width:18px; height:3px; background:#121210; }
+
+.stamp-btn { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; padding:18px 14px; border:3px solid #121210; box-shadow: 4px 4px 0 #121210; cursor:pointer; font-family:'Archivo'; font-weight:700; letter-spacing:0.1em; }
+.stamp-btn:active { transform: translate(4px,4px); box-shadow: 0 0 0 #121210; }
+
+input:focus, button:focus { outline: none; }
+</style>
+
+<div class="min-h-screen flex">
+
+  <!-- SIDEBAR -->
+  <aside class="w-[260px] shrink-0 bg-[#CFE8D6] border-r-[3px] border-[#121210] p-5 flex flex-col gap-2">
+    <div class="flex items-center gap-2 mb-6">
+      <div class="w-11 h-11 bg-[#2E8C42] brut-sm flex items-center justify-center">
+        <i class="ti ti-stamp text-[#FFFFFF] text-2xl"></i>
+      </div>
+      <div>
+        <div class="font-display font-bold text-lg leading-none">STAMPLY</div>
+        <div class="text-[10px] font-mono tracking-widest opacity-60">v2.4 · LEDGER</div>
+      </div>
+    </div>
+
+    <div class="text-[10px] font-mono tracking-widest opacity-50 mb-2 px-1">WORKSPACE</div>
+
+    <a class="nav-item brut bg-[#FFFFFF] flex items-center justify-between p-3 cursor-pointer">
+      <span class="flex items-center gap-3 font-display font-semibold"><i class="ti ti-inbox text-xl"></i>Inbox</span>
+      <span class="bg-[#121210] text-[#FFFFFF] font-mono text-xs px-2 py-0.5">12</span>
+    </a>
+    <a class="nav-item brut bg-[#E8A030] flex items-center justify-between p-3 cursor-pointer">
+      <span class="flex items-center gap-3 font-display font-semibold"><i class="ti ti-flame text-xl"></i>Escalations</span>
+      <span class="bg-[#C03A3A] text-[#FFFFFF] font-mono text-xs px-2 py-0.5">3</span>
+    </a>
+    <a class="nav-item brut bg-[#FFFFFF] flex items-center justify-between p-3 cursor-pointer">
+      <span class="flex items-center gap-3 font-display font-semibold"><i class="ti ti-archive text-xl"></i>History</span>
+      <span class="font-mono text-xs opacity-60">2,481</span>
+    </a>
+    <a class="nav-item brut bg-[#FFFFFF] flex items-center gap-3 p-3 cursor-pointer font-display font-semibold">
+      <i class="ti ti-git-merge text-xl"></i>Workflow Builder
+    </a>
+
+    <div class="mt-auto">
+      <div class="brut bg-[#FFFFFF] p-3">
+        <div class="text-[10px] font-mono tracking-widest opacity-60 mb-1">TODAY · STAMPED</div>
+        <div class="flex items-end gap-2">
+          <div class="font-mono font-bold text-3xl">47</div>
+          <div class="text-xs opacity-60 mb-1">of 59 pending</div>
+        </div>
+        <div class="mt-2 h-3 border-2 border-[#121210] flex overflow-hidden">
+          <div class="bg-[#2E8C42] w-[60%]"></div>
+          <div class="bg-[#C03A3A] w-[15%]"></div>
+          <div class="bg-[#E8A030] w-[10%]"></div>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 mt-3 p-2">
+        <img src="https://i.pravatar.cc/64?u=mara" class="w-9 h-9 border-2 border-[#121210]" decoding="async" loading="lazy" />
+        <div>
+          <div class="text-sm font-semibold leading-tight">Mara Vossberg</div>
+          <div class="text-[10px] font-mono opacity-60">CFO · APPROVER</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="flex-1 flex flex-col min-w-0">
+
+    <!-- TOP BAR -->
+    <header class="border-b-[3px] border-[#121210] bg-[#CFE8D6] px-6 py-4 flex items-center justify-between">
+      <div>
+        <div class="flex items-center gap-3">
+          <h1 class="font-display font-bold text-3xl">Approver Inbox</h1>
+          <span class="tag bg-[#FFFFFF]">12 PENDING</span>
+          <span class="tag bg-[#C03A3A] text-[#FFFFFF] border-[#121210]">3 PAST SLA</span>
+        </div>
+        <div class="text-xs font-mono opacity-60 mt-1">FRI · 14 MAR 2025 · 09:42:18 UTC</div>
+      </div>
+      <div class="flex gap-2">
+        <div class="brut bg-[#FFFFFF] flex items-center gap-2 px-3 py-2 w-72">
+          <i class="ti ti-search"></i>
+          <input class="bg-transparent flex-1 text-sm" placeholder="Search vendor, PO#, requester…" />
+          <span class="font-mono text-[10px] border border-[#121210] px-1">⌘K</span>
+        </div>
+        <button class="brut bg-[#121210] text-[#FFFFFF] px-4 font-display font-semibold btn-press">+ NEW REQUEST</button>
+      </div>
+    </header>
+
+    <!-- TABS -->
+    <div class="px-6 pt-4 flex gap-0 border-b-[3px] border-[#121210] bg-[#CFE8D6]">
+      <button class="tab-active font-display font-semibold px-5 py-2 border-[3px] border-[#121210] border-b-0 -mb-[3px]">Inbox</button>
+      <button class="font-display font-semibold px-5 py-2 border-[3px] border-[#121210] border-l-0 border-b-0 -mb-[3px] bg-[#FFFFFF]">Escalations</button>
+      <button class="font-display font-semibold px-5 py-2 border-[3px] border-[#121210] border-l-0 border-b-0 -mb-[3px] bg-[#FFFFFF]">History</button>
+      <button class="font-display font-semibold px-5 py-2 border-[3px] border-[#121210] border-l-0 border-b-0 -mb-[3px] bg-[#FFFFFF]">Workflow Builder</button>
+    </div>
+
+    <!-- SPLIT: list + detail -->
+    <div class="flex flex-1 min-h-0">
+
+      <!-- LIST -->
+      <section class="w-[44%] border-r-[3px] border-[#121210] p-5 space-y-4 overflow-y-auto bg-[#CFE8D6]">
+
+        <div class="flex items-center justify-between text-xs font-mono">
+          <div class="flex gap-2">
+            <button class="brut-sm bg-[#FFFFFF] px-2 py-1">ALL</button>
+            <button class="px-2 py-1 opacity-60">EXPENSES</button>
+            <button class="px-2 py-1 opacity-60">PO</button>
+          </div>
+          <span class="opacity-60">SORT: OLDEST FIRST ↓</span>
+        </div>
+
+        <!-- selected card -->
+        <article class="req-card brut-card p-4 relative cursor-pointer" style="background:#FFFFFF;">
+          <span class="absolute -top-2 -left-2 bg-[#E8A030] border-2 border-[#121210] px-2 py-0.5 text-[10px] font-mono font-bold">PO-2025-0418</span>
+          <div class="flex justify-between items-start">
+            <div>
+              <div class="font-display font-bold text-xl leading-tight">Helvetica Logistics Co.</div>
+              <div class="text-xs opacity-70 mt-0.5">Q1 Warehouse Rack Replacement · 14 line items</div>
+            </div>
+            <div class="text-right">
+              <div class="font-mono font-bold text-2xl">$48,920.00</div>
+              <div class="text-[10px] font-mono opacity-60">USD · NET-30</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 mt-3 flex-wrap">
+            <span class="tag bg-[#CFE8D6]">CAPEX</span>
+            <span class="tag bg-[#FFFFFF]">PURCHASE ORDER</span>
+            <span class="tag bg-[#E8A030]"><i class="ti ti-clock text-xs"></i>3D LEFT</span>
+          </div>
+          <div class="flex items-center justify-between mt-4">
+            <div class="flex items-center gap-2">
+              <img src="https://i.pravatar.cc/40?u=devin" class="w-7 h-7 border-2 border-[#121210]" decoding="async" loading="lazy"/>
+              <div class="text-xs"><span class="font-semibold">Devin Park</span><br/><span class="opacity-60 font-mono text-[10px]">OPS · SUBMITTED 09:11</span></div>
+            </div>
+            <div class="flex items-center">
+              <span class="chain-node bg-[#2E8C42] text-white">✓</span>
+              <span class="chain-line"></span>
+              <span class="chain-node bg-[#2E8C42] text-white">✓</span>
+              <span class="chain-line"></span>
+              <span class="chain-node bg-[#E8A030]">M</span>
+              <span class="chain-line"></span>
+              <span class="chain-node bg-[#FFFFFF] opacity-50">·</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- other cards -->
+        <article class="req-card brut-card p-4 relative cursor-pointer">
+          <span class="absolute -top-2 -left-2 bg-[#FFFFFF] border-2 border-[#121210] px-2 py-0.5 text-[10px] font-mono font-bold">EXP-9921</span>
+          <div class="flex justify-between items-start">
+            <div>
+              <div class="font-display font-bold text-xl leading-tight">Figma Inc.</div>
+              <div class="text-xs opacity-70 mt-0.5">Annual team seat renewal · 22 seats</div>
+            </div>
+            <div class="text-right">
+              <div class="font-mono font-bold text-2xl">$3,960.00</div>
+              <div class="text-[10px] font-mono opacity-60">USD · CARD</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 mt-3 flex-wrap">
+            <span class="tag bg-[#CFE8D6]">SOFTWARE</span>
+            <span class="tag bg-[#FFFFFF]">EXPENSE</span>
+          </div>
+          <div class="flex items-center justify-between mt-4">
+            <div class="flex items-center gap-2">
+              <img src="https://i.pravatar.cc/40?u=lena" class="w-7 h-7 border-2 border-[#121210]" decoding="async" loading="lazy"/>
+              <div class="text-xs"><span class="font-semibold">Lena Akhtar</span><br/><span class="opacity-60 font-mono text-[10px]">DESIGN · 08:47</span></div>
+            </div>
+            <div class="flex items-center">
+              <span class="chain-node bg-[#2E8C42] text-white">✓</span>
+              <span class="chain-line"></span>
+              <span class="chain-node bg-[#E8A030]">M</span>
+              <span class="chain-line"></span>
+              <span class="chain-node bg-[#FFFFFF] opacity-50">·</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="req-card brut-card p-4 relative cursor-pointer">
+          <span class="absolute -top-2 -left-2 bg-[#C03A3A] text-[#FFFFFF] border-2 border-[#121210] px-2 py-0.5 text-[10px] font-mono font-bold">⚠ PO-2025-0402</span>
+          <div class="flex justify-between items-start">
+            <div>
+              <div class="font-display font-bold text-xl leading-tight">Brunswick Catering Ltd.</div>
+              <div class="text-xs opacity-70 mt-0.5">Off-site quarterly event · Q1</div>
+            </div>
+            <div class="text-right">
+              <div class="font-mono font-bold text-2xl">$12,480.50</div>
+              <div class="text-[10px] font-mono opacity-60">USD · INVOICE</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 mt-3 flex-wrap">
+            <span class="tag bg-[#CFE8D6]">EVENTS</span>
+            <span class="tag bg-[#C03A3A] text-[#FFFFFF]"><i class="ti ti-flame text-xs"></i>ESCALATED</span>
+            <span class="tag bg-[#FFFFFF]">+2 DAYS LATE</span>
+          </div>
+          <div class="flex items-center justify-between mt-4">
+            <div class="flex items-center gap-2">
+              <img src="https://i.pravatar.cc/40?u=marco" class="w-7 h-7 border-2 border-[#121210]" decoding="async" loading="lazy"/>
+              <div class="text-xs"><span class="font-semibold">Marco Reyes</span><br/><span class="opacity-60 font-mono text-[10px]">PEOPLE OPS · 11 MAR</span></div>
+            </div>
+            <div class="flex items-center">
+              <span class="chain-node bg-[#2E8C42] text-white">✓</span>
+              <span class="chain-line"></span>
+              <span class="chain-node bg-[#C03A3A] text-white">!</span>
+              <span class="chain-line"></span>
+              <span class="chain-node bg-[#FFFFFF] opacity-50">·</span>
+            </div>
+          </div>
+        </article>
+
+        <!-- (two more cards with the same structure omitted in the original order: EXP-9918 AWS · Production $27,304.18; EXP-9914 Hotel Vier Jahreszeiten $1,842.00) -->
+
+      </section>
+
+      <!-- DETAIL / STAMPING -->
+      <section class="flex-1 p-6 overflow-y-auto" style="background-image: linear-gradient(rgba(18,18,16,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(18,18,16,0.05) 1px,transparent 1px); background-size: 28px 28px;">
+
+        <div class="document-layout flex gap-5 items-start">
+
+          <!-- Invoice document -->
+          <div id="invoice" class="flex-1 bg-white brut-lg p-7 relative overflow-hidden" style="min-height:560px;">
+
+            <!-- Watermark big stamp drop target -->
+            <div id="stamp-drop" class="absolute top-10 right-10 pointer-events-none"></div>
+
+            <div class="flex justify-between items-start border-b-[3px] border-[#121210] pb-4">
+              <div>
+                <div class="font-display font-bold text-3xl">PURCHASE ORDER</div>
+                <div class="font-mono text-xs opacity-70 mt-1">PO-2025-0418 · ISSUED 14 MAR 2025</div>
+              </div>
+              <div class="text-right">
+                <div class="font-mono text-xs opacity-60">BILL TO</div>
+                <div class="font-display font-bold">Stamply Holdings GmbH</div>
+                <div class="font-mono text-[10px] opacity-60">DE-10115 BERLIN · VAT DE318442001</div>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-4 mt-5">
+              <div>
+                <div class="font-mono text-[10px] opacity-60 tracking-widest">VENDOR</div>
+                <div class="font-display font-bold text-lg leading-tight">Helvetica Logistics Co.</div>
+                <div class="text-xs opacity-70">Zurich · CH-8005</div>
+              </div>
+              <div>
+                <div class="font-mono text-[10px] opacity-60 tracking-widest">CATEGORY</div>
+                <div class="font-display font-bold text-lg">CapEx · Warehouse</div>
+                <div class="text-xs opacity-70">GL 4420 · Cost Ctr OPS-EU</div>
+              </div>
+              <div>
+                <div class="font-mono text-[10px] opacity-60 tracking-widest">DUE</div>
+                <div class="font-display font-bold text-lg">17 MAR 2025</div>
+                <div class="text-xs opacity-70">Net-30 · Wire</div>
+              </div>
+            </div>
+
+            <!-- line items -->
+            <table class="w-full mt-6 font-mono text-sm">
+              <thead>
+                <tr class="border-y-[3px] border-[#121210]">
+                  <th class="text-left py-2 font-semibold text-xs tracking-widest">DESCRIPTION</th>
+                  <th class="text-right py-2 font-semibold text-xs tracking-widest w-16">QTY</th>
+                  <th class="text-right py-2 font-semibold text-xs tracking-widest w-28">UNIT</th>
+                  <th class="text-right py-2 font-semibold text-xs tracking-widest w-32">AMOUNT</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="border-b border-[#121210]/20"><td class="py-2">Heavy-duty pallet racking, 4-tier</td><td class="text-right">24</td><td class="text-right">1,280.00</td><td class="text-right">30,720.00</td></tr>
+                <tr class="border-b border-[#121210]/20"><td class="py-2">Anchor bolts (M16) — case of 50</td><td class="text-right">12</td><td class="text-right">86.40</td><td class="text-right">1,036.80</td></tr>
+                <tr class="border-b border-[#121210]/20"><td class="py-2">Installation labor · 3-day crew</td><td class="text-right">1</td><td class="text-right">14,800.00</td><td class="text-right">14,800.00</td></tr>
+                <tr class="border-b border-[#121210]/20"><td class="py-2">Freight + customs handling</td><td class="text-right">1</td><td class="text-right">2,363.20</td><td class="text-right">2,363.20</td></tr>
+              </tbody>
+              <tfoot>
+                <tr><td colspan="3" class="text-right py-1 opacity-70 text-xs">Subtotal</td><td class="text-right">48,920.00</td></tr>
+                <tr><td colspan="3" class="text-right py-1 opacity-70 text-xs">VAT (incl.)</td><td class="text-right">— —</td></tr>
+                <tr class="border-t-[3px] border-[#121210]"><td colspan="3" class="text-right py-2 font-display font-bold">TOTAL USD</td><td class="text-right font-bold text-xl">$48,920.00</td></tr>
+              </tfoot>
+            </table>
+
+            <!-- approval chain -->
+            <div class="mt-6 border-t-[3px] border-[#121210] pt-4">
+              <div class="font-mono text-[10px] opacity-60 tracking-widest mb-3">APPROVAL CHAIN</div>
+              <div class="flex items-center gap-2 flex-wrap">
+                <div class="brut-sm bg-[#2E8C42] text-white px-3 py-2 text-xs">
+                  <div class="font-bold">D. Park</div><div class="opacity-80">Submitter</div>
+                </div>
+                <i class="ti ti-arrow-narrow-right text-xl"></i>
+                <div class="brut-sm bg-[#2E8C42] text-white px-3 py-2 text-xs">
+                  <div class="font-bold">A. Klein ✓</div><div class="opacity-80">Mgr · 09:18</div>
+                </div>
+                <i class="ti ti-arrow-narrow-right text-xl"></i>
+                <div class="brut-sm bg-[#2E8C42] text-white px-3 py-2 text-xs">
+                  <div class="font-bold">R. Sato ✓</div><div class="opacity-80">Fin Ctrl · 09:31</div>
+                </div>
+                <i class="ti ti-arrow-narrow-right text-xl"></i>
+                <div class="brut-sm bg-[#E8A030] px-3 py-2 text-xs">
+                  <div class="font-bold">YOU (CFO)</div><div class="opacity-80">Pending</div>
+                </div>
+                <i class="ti ti-arrow-narrow-right text-xl opacity-30"></i>
+                <div class="border-2 border-dashed border-[#121210]/40 px-3 py-2 text-xs opacity-60">
+                  <div class="font-bold">Board</div><div>Cond. ≥ $50k</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stamp button column -->
+          <div class="document-actions w-44 shrink-0 sticky top-6 space-y-4">
+            <div class="font-mono text-[10px] tracking-widest opacity-60">DECIDE</div>
+            <button id="btn-approve" class="stamp-btn w-full bg-[#2E8C42] text-white">
+              <i class="ti ti-check text-3xl"></i>
+              <span>APPROVE</span>
+              <span class="font-mono text-[10px] opacity-80 normal-case tracking-normal">⌘ + ↵</span>
+            </button>
+            <button id="btn-reject" class="stamp-btn w-full bg-[#C03A3A] text-white">
+              <i class="ti ti-x text-3xl"></i>
+              <span>REJECT</span>
+              <span class="font-mono text-[10px] opacity-80 normal-case tracking-normal">⌘ + ⌫</span>
+            </button>
+            <button id="btn-detail" class="stamp-btn w-full bg-[#E8A030]">
+              <i class="ti ti-info-circle text-3xl"></i>
+              <span>NEEDS DETAIL</span>
+              <span class="font-mono text-[10px] opacity-80 normal-case tracking-normal">⌘ + D</span>
+            </button>
+
+            <div class="brut bg-white p-3 mt-6">
+              <div class="font-mono text-[10px] tracking-widest opacity-60">POLICY CHECK</div>
+              <div class="text-xs mt-2 flex justify-between"><span>3-quote rule</span><span class="text-[#2E8C42] font-bold">PASS</span></div>
+              <div class="text-xs mt-1 flex justify-between"><span>Budget · CapEx</span><span class="text-[#2E8C42] font-bold">62%</span></div>
+              <div class="text-xs mt-1 flex justify-between"><span>Vendor KYC</span><span class="text-[#2E8C42] font-bold">OK</span></div>
+              <div class="text-xs mt-1 flex justify-between"><span>SLA risk</span><span class="text-[#E8A030] font-bold">3D</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- AUDIT LOG -->
+        <div class="mt-6 brut bg-[#121210] text-[#FFFFFF] p-5">
+          <div class="flex items-center justify-between mb-3">
+            <div class="font-display font-bold text-lg flex items-center gap-2"><i class="ti ti-list-details"></i>AUDIT LOG</div>
+            <span class="font-mono text-[10px] opacity-60">IMMUTABLE · SHA-256 CHAINED</span>
+          </div>
+          <pre class="font-mono text-xs leading-6 whitespace-pre-wrap opacity-90">
+2025-03-14 09:11:02Z  CREATED   devin.park@stamply.io     PO-2025-0418 submitted · $48,920.00
+2025-03-14 09:11:04Z  ROUTED    system                    → chain "CapEx ≥ $25k" (4 stages)
+2025-03-14 09:18:47Z  STAMPED   anna.klein@stamply.io     APPROVED · stage 1/4 · note: "Ops signed off."
+2025-03-14 09:31:12Z  STAMPED   ryo.sato@stamply.io       APPROVED · stage 2/4 · attach: 3-quote-comparison.pdf
+2025-03-14 09:41:55Z  VIEWED    mara.vossberg@stamply.io  stage 3/4 — awaiting decision
+2025-03-14 09:42:18Z  ─        ─                         cursor blinking …▌</pre>
+        </div>
+
+        <!-- HISTORY MINI TABLE -->
+        <div class="mt-6 brut bg-[#FFFFFF] overflow-hidden">
+          <div class="flex items-center justify-between p-4 border-b-[3px] border-[#121210]">
+            <div class="font-display font-bold text-lg flex items-center gap-2"><i class="ti ti-archive"></i>RECENTLY STAMPED</div>
+            <button class="text-xs font-mono underline">VIEW ALL 2,481 →</button>
+          </div>
+          <table class="history-table w-full font-mono text-sm">
+            <thead class="bg-[#CFE8D6]">
+              <tr class="border-b-[3px] border-[#121210]">
+                <th class="text-left p-3 text-xs tracking-widest">ID</th>
+                <th class="text-left p-3 text-xs tracking-widest">VENDOR</th>
+                <th class="text-right p-3 text-xs tracking-widest">AMOUNT</th>
+                <th class="text-left p-3 text-xs tracking-widest">ACTOR</th>
+                <th class="text-left p-3 text-xs tracking-widest">TIMESTAMP</th>
+                <th class="text-right p-3 text-xs tracking-widest">STATUS</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="border-b border-[#121210]/30"><td class="p-3">EXP-9912</td><td class="p-3">Linear B.V.</td><td class="text-right p-3">  1,440.00</td><td class="p-3">M. Vossberg</td><td class="p-3 opacity-70">14 MAR · 08:21</td><td class="text-right p-3"><span class="stamp text-[#2E8C42] text-[10px]" style="transform:rotate(-2deg);display:inline-block">APPROVED</span></td></tr>
+              <tr class="border-b border-[#121210]/30"><td class="p-3">PO-2025-0417</td><td class="p-3">Kuehne+Nagel</td><td class="text-right p-3"> 18,250.00</td><td class="p-3">R. Sato</td><td class="p-3 opacity-70">13 MAR · 17:04</td><td class="text-right p-3"><span class="stamp text-[#C03A3A] text-[10px]" style="transform:rotate(2deg);display:inline-block">REJECTED</span></td></tr>
+              <tr class="border-b border-[#121210]/30"><td class="p-3">EXP-9908</td><td class="p-3">DoorDash for Biz</td><td class="text-right p-3">    482.16</td><td class="p-3">A. Klein</td><td class="p-3 opacity-70">13 MAR · 14:48</td><td class="text-right p-3"><span class="stamp text-[#E8A030] text-[10px]" style="transform:rotate(-2deg);display:inline-block">NEEDS DETAIL</span></td></tr>
+              <tr><td class="p-3">PO-2025-0416</td><td class="p-3">Notion Labs Inc.</td><td class="text-right p-3">  9,720.00</td><td class="p-3">M. Vossberg</td><td class="p-3 opacity-70">13 MAR · 11:12</td><td class="text-right p-3"><span class="stamp text-[#2E8C42] text-[10px]" style="transform:rotate(-2deg);display:inline-block">APPROVED</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- WORKFLOW BUILDER PREVIEW -->
+        <div class="mt-6 brut bg-[#FFFFFF] overflow-hidden">
+          <div class="flex items-center justify-between p-4 border-b-[3px] border-[#121210]">
+            <div>
+              <div class="font-display font-bold text-lg flex items-center gap-2"><i class="ti ti-git-merge"></i>WORKFLOW BUILDER — "CapEx ≥ $25k"</div>
+              <div class="text-xs font-mono opacity-60 mt-0.5">Drag stages to reorder · 4 stages · used by 142 requests</div>
+            </div>
+            <div class="flex gap-2">
+              <button class="brut-sm bg-[#FFFFFF] px-3 py-1.5 text-xs font-display font-semibold">+ STAGE</button>
+              <button class="brut-sm bg-[#2E8C42] text-white px-3 py-1.5 text-xs font-display font-semibold">PUBLISH</button>
+            </div>
+          </div>
+          <div class="polka p-6">
+            <div class="flex items-center gap-1 flex-wrap">
+              <div class="brut bg-[#CFE8D6] px-4 py-3 cursor-grab">
+                <div class="font-mono text-[10px] opacity-60">TRIGGER</div>
+                <div class="font-display font-bold">New Request</div>
+              </div>
+              <div class="flex items-center"><div class="w-6 h-1 bg-[#121210]"></div><div class="w-0 h-0" style="border-top:6px solid transparent;border-bottom:6px solid transparent;border-left:8px solid #121210"></div></div>
+              <div class="brut bg-[#FFFFFF] px-4 py-3 cursor-grab">
+                <div class="font-mono text-[10px] opacity-60">STAGE 1 · MGR</div>
+                <div class="font-display font-bold">Direct Manager</div>
+                <div class="text-[10px] font-mono opacity-60">SLA: 24h</div>
+              </div>
+              <div class="flex items-center"><div class="w-6 h-1 bg-[#121210]"></div><div class="w-0 h-0" style="border-top:6px solid transparent;border-bottom:6px solid transparent;border-left:8px solid #121210"></div></div>
+              <div class="brut bg-[#FFFFFF] px-4 py-3 cursor-grab">
+                <div class="font-mono text-[10px] opacity-60">STAGE 2 · FIN</div>
+                <div class="font-display font-bold">Fin Controller</div>
+                <div class="text-[10px] font-mono opacity-60">SLA: 48h</div>
+              </div>
+              <div class="flex items-center"><div class="w-6 h-1 bg-[#121210]"></div><div class="w-0 h-0" style="border-top:6px solid transparent;border-bottom:6px solid transparent;border-left:8px solid #121210"></div></div>
+              <div class="brut bg-[#E8A030] px-4 py-3 cursor-grab">
+                <div class="font-mono text-[10px] opacity-80">STAGE 3 · EXEC</div>
+                <div class="font-display font-bold">CFO Review</div>
+                <div class="text-[10px] font-mono">SLA: 72h</div>
+              </div>
+              <div class="flex items-center"><div class="w-6 h-1 bg-[#121210]"></div><div class="w-0 h-0" style="border-top:6px solid transparent;border-bottom:6px solid transparent;border-left:8px solid #121210"></div></div>
+              <div class="brut bg-white px-4 py-3 cursor-grab border-dashed">
+                <div class="font-mono text-[10px] opacity-60">STAGE 4 · COND.</div>
+                <div class="font-display font-bold">Board (≥ $50k)</div>
+                <div class="text-[10px] font-mono opacity-60">Conditional</div>
+              </div>
+              <div class="flex items-center"><div class="w-6 h-1 bg-[#121210]"></div><div class="w-0 h-0" style="border-top:6px solid transparent;border-bottom:6px solid transparent;border-left:8px solid #2E8C42"></div></div>
+              <div class="brut bg-[#2E8C42] text-white px-4 py-3">
+                <div class="font-mono text-[10px] opacity-80">OUTCOME</div>
+                <div class="font-display font-bold">Pay &amp; Post</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ESCALATION QUEUE -->
+        <div class="mt-6 brut overflow-hidden stripes-amber p-1">
+          <div class="bg-[#CFE8D6] p-4">
+            <div class="flex items-center justify-between mb-4">
+              <div class="font-display font-bold text-lg flex items-center gap-2"><i class="ti ti-alert-triangle text-[#C03A3A]"></i>ESCALATION QUEUE · 3 PAST SLA</div>
+              <span class="font-mono text-[10px] opacity-60">AUTO-ESCALATES AT +24H</span>
+            </div>
+            <div class="grid grid-cols-3 gap-4">
+              <div class="brut bg-white p-4 border-[#C03A3A]">
+                <div class="flex justify-between items-start">
+                  <span class="tag bg-[#C03A3A] text-white">+52H LATE</span>
+                  <i class="ti ti-flame text-xl text-[#C03A3A]"></i>
+                </div>
+                <div class="font-display font-bold text-lg mt-2">Brunswick Catering</div>
+                <div class="font-mono font-bold text-xl mt-1">$12,480.50</div>
+                <div class="text-xs opacity-60 mt-1">Stuck at: Fin Controller</div>
+              </div>
+              <div class="brut bg-white p-4 border-[#E8A030]">
+                <div class="flex justify-between items-start">
+                  <span class="tag bg-[#E8A030]">+18H LATE</span>
+                  <i class="ti ti-alert-triangle text-xl text-[#E8A030]"></i>
+                </div>
+                <div class="font-display font-bold text-lg mt-2">CloudFlare Ent.</div>
+                <div class="font-mono font-bold text-xl mt-1">$8,200.00</div>
+                <div class="text-xs opacity-60 mt-1">Stuck at: Director</div>
+              </div>
+              <div class="brut bg-white p-4 border-[#C03A3A]">
+                <div class="flex justify-between items-start">
+                  <span class="tag bg-[#C03A3A] text-white">+71H LATE</span>
+                  <i class="ti ti-flame text-xl text-[#C03A3A]"></i>
+                </div>
+                <div class="font-display font-bold text-lg mt-2">Bosch Mobility</div>
+                <div class="font-mono font-bold text-xl mt-1">$61,440.00</div>
+                <div class="text-xs opacity-60 mt-1">Stuck at: Board review</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </section>
+    </div>
+  </main>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+<script type="module">
+  import { animate, spring } from 'https://esm.sh/animejs@4';
+
+  gsap.from('.req-card', { autoAlpha: 0, y: 24, duration: 0.5, ease: 'power3.out', stagger: 0.06 });
+  gsap.from('#invoice', { autoAlpha: 0, y: 20, duration: 0.6, ease: 'power3.out', delay: 0.15 });
+  gsap.from('.stamp-btn', { autoAlpha: 0, x: 30, duration: 0.5, ease: 'power3.out', stagger: 0.08, delay: 0.3 });
+
+  const drop = document.getElementById('stamp-drop');
+  const invoice = document.getElementById('invoice');
+
+  function dropStamp(label, color){
+    drop.innerHTML = '';
+    const el = document.createElement('div');
+    el.className = 'big-stamp';
+    el.textContent = label;
+    el.style.color = color;
+    el.style.transform = 'scale(3) rotate(-15deg)';
+    el.style.opacity = '0';
+    drop.appendChild(el);
+
+    animate(el, {
+      scale: [3, 1],
+      rotate: [-15, -6],
+      opacity: [0, 0.88],
+      duration: 600,
+      ease: spring({ stiffness: 90, damping: 8, mass: 1.4 })
+    });
+    animate(invoice, {
+      x: [0, -8, 6, -4, 2, 0],
+      duration: 600,
+      ease: 'outElastic(1, 0.5)'
+    });
+  }
+
+  document.getElementById('btn-approve').addEventListener('click', ()=> dropStamp('APPROVED','#2E8C42'));
+  document.getElementById('btn-reject').addEventListener('click', ()=> dropStamp('REJECTED','#C03A3A'));
+  document.getElementById('btn-detail').addEventListener('click', ()=> dropStamp('NEEDS DETAIL','#E8A030'));
+</script>
+  </body>
+</html>

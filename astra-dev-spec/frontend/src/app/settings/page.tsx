@@ -1,0 +1,16 @@
+"use client";
+import { useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { api, type Schema } from "@/lib/api";
+import { Shell } from "@/components/shell";
+import { ErrorBanner, LoadingPanel, PrimaryButton, Tag, TextField } from "@/components/ui";
+function SettingsForm({ settings }: { settings: Schema<"LlmSettings"> }) {
+  const cache = useQueryClient(), [base, setBase] = useState(settings.base_url || ""), [model, setModel] = useState(settings.model || ""), [key, setKey] = useState("");
+  const update = () => cache.invalidateQueries();
+  const save = useMutation({ mutationFn: () => api<Schema<"LlmSettings">>("/settings/llm", { method: "PUT", body: JSON.stringify({ base_url: base, model, ...(key ? { api_key: key } : {}) }) }), onSuccess: () => { setKey(""); update(); } });
+  const test = useMutation({ mutationFn: () => api<Schema<"TestConnection">>("/settings/llm/test", { method: "POST" }), onSuccess: update });
+  const clear = useMutation({ mutationFn: () => api<Schema<"LlmSettings">>("/settings/llm", { method: "DELETE" }), onSuccess: update });
+  const busy = save.isPending || test.isPending || clear.isPending, error = save.error || test.error || clear.error, result = test.data || settings.last_test;
+  return <article className="paper-document brut-lg"><Tag tone={settings.configured ? "ok" : "warn-soft"}>{settings.configured ? "已接入" : "未接入（使用内置夹具）"}</Tag><form onSubmit={e => { e.preventDefault(); save.mutate(); }}><TextField label="接口地址" value={base} placeholder="例如 https://api.example.com/v1" onChange={e => setBase(e.target.value)} required /><TextField label="API Key" type="password" value={key} onChange={e => setKey(e.target.value)} autoComplete="off" required={!settings.configured} />{settings.api_key_masked && <p className="body-copy">已保存 {settings.api_key_masked}，留空则不修改</p>}<TextField label="模型名称" value={model} placeholder="填写服务商提供的模型 ID" onChange={e => setModel(e.target.value)} required /><div className="button-row"><PrimaryButton type="submit" disabled={busy}>保存</PrimaryButton><button type="button" className="secondary-button brut-sm" disabled={busy || !settings.configured} onClick={() => test.mutate()}>测试连接</button><button type="button" className="secondary-button brut-sm text-bad" disabled={busy || !settings.configured} onClick={() => clear.mutate()}>清除配置</button></div></form>{error && <ErrorBanner error={error} />}{result && <p className={result.ok ? "text-ok" : "text-bad"}>{result.ok ? "连接成功" : `连接失败：${result.message}`} {result.latency_ms !== null && `${result.latency_ms} ms`}</p>}<p className="body-copy">接口需兼容 OpenAI Chat Completions 格式（POST {base || "{接口地址}"}/chat/completions）。未配置时，智能体使用内置夹具。</p></article>;
+}
+export default function Page() { const settings = useQuery({ queryKey: ["llm-settings"], queryFn: () => api<Schema<"LlmSettings">>("/settings/llm") }); return <Shell title="模型接入"><div className="single-page grid-doc"><div className="single-content settings-content">{settings.isPending && <LoadingPanel />}{settings.error && <ErrorBanner error={settings.error} retry={() => settings.refetch()} />}{settings.data && <SettingsForm key={`${settings.data.configured}-${settings.data.base_url}-${settings.data.model}`} settings={settings.data} />}</div></div></Shell>; }
