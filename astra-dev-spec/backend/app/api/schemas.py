@@ -127,6 +127,8 @@ class ImpactCard(BaseModel):
     tag: Literal["利好", ""]
     profit_delta_usd: float
     countdown: Countdown
+    rate_baseline_user_pct: float
+    rate_new_pct: float
     chain: list[ChainNode]
     decision: DecisionKind
 
@@ -177,9 +179,7 @@ class ImpactDetail(ImpactCard):
     margin_delta_pp: float
     adopted_actions: list[AdoptedAction] = Field(default_factory=list)
     note: str | None = None
-    rate_baseline_user_pct: float
     rate_baseline_rules_pct: float
-    rate_new_pct: float
     duty_baseline_usd: float
     duty_new_usd: float
     duty_delta_usd: float

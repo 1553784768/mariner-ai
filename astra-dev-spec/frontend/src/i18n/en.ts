@@ -287,4 +287,57 @@ const messages: Record<string, string> = {
   请求参数不合法: "Invalid request parameters",
   "采纳建议（{n}）": "Adopt ({n})",
 };
+messages["税则 {hts_release}"] = "HTS {hts_release}";
+messages["税率 {base} → {new}"] ??= "Rate {base} → {new}";
+messages["红色风险"] ??= "Red risk";
+messages["橙色风险"] ??= "Orange risk";
+messages["黄色风险"] ??= "Yellow risk";
+messages["绿色风险"] ??= "Green risk";
+messages["原因：{text}"] ??= "Reason: {text}";
+messages["综合税率 {a} → {b}，关税增量 {d}；利润 {p0} → {p1}，毛利率 {m0} → {m1}。"] ??=
+  "Combined rate {a} → {b}, duty change {d}; profit {p0} → {p1}, margin {m0} → {m1}.";
+messages["综合税率 {new}（原 {base}）"] ??= "Combined rate {new} (was {base})";
+messages["报价日"] ??= "Quote date";
+messages["今天"] ??= "Today";
+messages["规则边界"] ??= "Rule boundary";
+messages["规则边界 {date}"] ??= "Rule boundary {date}";
+messages["{n}月"] ??= "{n}";
+messages["税率分层"] ??= "Duty layers";
+messages["利润"] ??= "Profit";
+messages["没有不通过项"] ??= "No failed checks";
+messages["没有注意项"] ??= "No warnings";
+messages["没有通过项"] ??= "No passed checks";
+messages["暂无临界事件"] ??= "No critical events";
+messages["暂无处理记录"] ??= "No decisions yet";
+messages["{n} 待处理"] ??= "{n} pending";
+messages["{n} 红色"] ??= "{n} red";
+messages["{n} 紧急"] ??= "{n} urgent";
+messages["{n} 临界事件"] ??= "{n} critical events";
+messages["政策日报 {date}"] ??= "Policy brief {date}";
+messages["生成于 {date}"] ??= "Generated {date}";
+messages["订单汇总"] ??= "Order summary";
+messages["美国关税政策日报"] ??= "U.S. Tariff Policy Brief";
+messages["结论按生成时的订单状态计算，之后的决策和重算不会更新这句话。"] ??=
+  "This conclusion reflects order status when the brief was generated. Later decisions and recalculations do not update it.";
+messages["类型"] ??= "Type";
+messages["{type} · 更新于 {date}"] ??= "{type} · Updated {date}";
+messages["{n} 待确认"] ??= "{n} to confirm";
+messages["{n} 需补充"] ??= "{n} needs detail";
+messages["{n} 已确认"] ??= "{n} approved";
+messages["{n} 已驳回"] ??= "{n} rejected";
+messages["不适用：{list}"] ??= "N/A: {list}";
+messages["受影响订单"] ??= "Affected orders";
+messages["步骤"] ??= "Steps";
+messages["动作"] ??= "Action";
+messages["执行者"] ??= "Actor";
+messages["摘要"] ??= "Summary";
+messages["还没有运行记录"] ??= "No runs yet";
+messages["连接状态"] ??= "Connection";
+messages["连接失败"] ??= "Connection failed";
+messages["（"] ??= " (";
+messages["）"] ??= ")";
+messages["暂无税率"] ??= "No rate yet";
+messages["预估影响"] ??= "Estimated impact";
+messages["文件未导入，请修正以下错误"] ??= "The file was not imported. Fix the following errors.";
+messages["无法连接模型服务"] ??= "Unable to connect to the model service";
 export default messages;

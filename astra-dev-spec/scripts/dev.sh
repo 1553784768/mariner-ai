@@ -4,7 +4,6 @@ project_root="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 export NEXT_TELEMETRY_DISABLED=1
 export NEXT_PUBLIC_API_BASE=http://127.0.0.1:8000
 if [[ "${1:-}" == "--fixture" ]]; then
-  export NEXT_FONT_GOOGLE_MOCKED_RESPONSES="$(node "$project_root/scripts/prepare-test-fonts.cjs")"
   export COLLECTOR_MODE=fixture AS_OF_DATE=2026-10-31 SCHEDULER_ENABLED=false
 fi
 if [[ ! -x "$project_root/backend/.venv/bin/python" || ! -f "$project_root/frontend/node_modules/next/dist/bin/next" ]]; then

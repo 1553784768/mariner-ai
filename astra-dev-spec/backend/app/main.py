@@ -52,7 +52,7 @@ def create_app(settings=None):
             pipeline.close()
             engine.dispose()
 
-    app = FastAPI(title="Mariner AI", version="0.2.1", lifespan=lifespan)
+    app = FastAPI(title="Mariner AI", version="0.3.0", lifespan=lifespan)
     app.state.settings = settings
     register_errors(app)
     app.include_router(router)

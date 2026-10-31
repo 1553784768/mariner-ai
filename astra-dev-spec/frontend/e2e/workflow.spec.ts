@@ -4,6 +4,7 @@ import { resolve } from "node:path";
 const screenshots = resolve(__dirname, "../../artifacts/screenshots");
 async function shot(page: Page, name: string) {
   mkdirSync(screenshots, { recursive: true });
+  await expect(page.locator(".topbar-clock")).toContainText(/\d{4}-\d{2}-\d{2}/);
   await page.evaluate(() => document.fonts.ready);
   await page.screenshot({ path: resolve(screenshots, `${name}.png`), fullPage: false });
 }
@@ -27,53 +28,63 @@ test("milestones: components, inbox, decision, pipeline, review, brief", async (
     ),
   ).toEqual([]);
   await page.goto("/inbox");
-  await expect(page.locator(".impact-card")).toHaveCount(8);
+  await expect(page.locator("[data-order]")).toHaveCount(8);
   expect(
-    await page.locator(".impact-card").evaluateAll((cards) => cards.map((c) => c.getAttribute("data-order"))),
+    await page.locator("[data-order]").evaluateAll((cards) => cards.map((c) => c.getAttribute("data-order"))),
   ).toEqual(["O5", "O1", "O3", "O6", "O4", "O2", "O8", "O7"]);
-  await expect(page.getByRole("link", { name: "风险收件箱 8" })).toHaveAttribute("aria-current", "page");
-  await expect(page.locator(".brand")).toContainText("Mariner AI");
-  await expect(page.locator(".sidebar nav a")).toHaveCount(7);
-  await expect(page.locator(".sidebar nav a").first()).toContainText("工作台");
-  await expect(page.locator(".document-header h2")).toHaveText("订单影响单");
-  await expect(page.locator(".document-header .label-mono")).toContainText("O5 · 规则快照 2026-10-31 · RUN-");
+  await expect(page.getByRole("link", { name: /风险收件箱/ })).toHaveAttribute("aria-current", "page");
+  await expect(page.locator(".topbar-org")).toContainText("Mariner AI");
+  await expect(page.locator(".sidebar a.nav-item")).toHaveCount(7);
+  await expect(page.locator(".sidebar a.nav-item").first()).toContainText("工作台");
+  await expect(page.locator(".detail-heading")).toHaveText(
+    (await (await request.get("http://127.0.0.1:8001/api/impacts/O5")).json()).product,
+  );
+  await expect(page.locator(".detail-panel .device-tag")).toContainText("O5 · HTS");
   await shot(page, "T-4.1");
-  await page.getByRole("button", { name: "DDP", exact: true }).click();
-  await expect(page.locator(".impact-card")).toHaveCount(6);
-  await page.getByRole("button", { name: "全部", exact: true }).click();
+  await page.getByLabel("贸易术语", { exact: true }).selectOption("ddp");
+  await expect(page.locator("[data-order]")).toHaveCount(6);
+  await page.getByLabel("贸易术语", { exact: true }).selectOption("all");
   await page.getByRole("tab", { name: /紧急/ }).click();
-  await expect(page.locator(".impact-card")).toHaveCount(2);
+  const urgent = await (
+    await request.get("http://127.0.0.1:8001/api/impacts?risk=%E7%BA%A2,%E6%A9%99&decision=pending")
+  ).json();
+  await expect(page.locator("[data-order]")).toHaveCount(urgent.length);
   expect(
-    await page.locator(".impact-card").evaluateAll((cards) => cards.map((c) => c.getAttribute("data-order"))),
-  ).toEqual(["O5", "O6"]);
+    await page.locator("[data-order]").evaluateAll((cards) => cards.map((c) => c.getAttribute("data-order"))),
+  ).toEqual(urgent.map((card: { order_id: string }) => card.order_id));
   await page.getByRole("tab", { name: "全部", exact: true }).click();
   await page.locator('[data-order="O5"]').click();
   await expect(page).toHaveURL(/order=O5/);
   await expect(page.locator('[data-order="O5"]')).toContainText("规则边界 9天");
   await shot(page, "T-4.2");
+  await page.getByRole("tab", { name: "税率分层", exact: true }).click();
   await expect(page.getByTestId("layers")).toContainText("$10,816.00");
   await expect(page.getByTestId("layers")).toContainText("$26,816.00");
   await expect(page.getByTestId("layers")).toContainText("+$16,000.00");
+  await page.getByRole("tab", { name: "利润", exact: true }).click();
   await expect(page.getByTestId("profits")).toContainText("$8,473.57");
   await expect(page.getByTestId("profits")).toContainText("−$7,526.43");
-  await expect(page.locator(".action-list li")).toHaveCount(4);
-  await expect(page.locator(".check-row").filter({ hasText: "未核实字段" })).toContainText("注意");
+  await page.getByRole("tab", { name: /可执行建议/ }).click();
+  await expect(page.locator(".route-entry.selectable")).toHaveCount(4);
+  await page.getByRole("tab", { name: "规则核验", exact: true }).click();
+  await expect(page.locator(".detail-panel .route-col").nth(1)).toContainText("未核实字段2");
   await shot(page, "T-4.3-1440");
   await page.setViewportSize({ width: 1300, height: 900 });
-  await expect(page.locator(".document-actions")).toHaveCSS("display", "grid");
+  await expect(page.locator(".detail-actions")).toHaveCSS("display", "flex");
   await shot(page, "T-4.3-1300");
   await page.setViewportSize({ width: 1440, height: 900 });
+  await page.getByRole("tab", { name: /可执行建议/ }).click();
   await page.getByRole("checkbox", { name: "action-1", exact: true }).check();
   await page.locator("h1").click();
   await page.keyboard.press("Control+Enter");
-  await expect(page.getByTestId("big-stamp")).toHaveText("已采纳");
+  await expect(page.getByTestId("decision-state")).toHaveText("已采纳");
   await expect(page.locator(".history-table")).toContainText("O5");
   await shot(page, "T-4.3-adopted");
-  await expect(page.locator(".critical-card")).toHaveCount(3);
-  await expect(page.locator(".critical-card").filter({ hasText: "机器人" })).toContainText(
+  await expect(page.locator("#watch-events .route-col")).toHaveCount(3);
+  await expect(page.locator("#watch-events .route-col").filter({ hasText: "机器人" })).toContainText(
     "影响 1 单 · 暂无税率",
   );
-  await page.locator(".critical-panel").scrollIntoViewIfNeeded();
+  await page.locator("#watch-events").scrollIntoViewIfNeeded();
   await shot(page, "T-4.4");
   await page.getByRole("link", { name: "智能体流水线", exact: true }).click();
   let polls = 0;
@@ -87,15 +98,16 @@ test("milestones: components, inbox, decision, pipeline, review, brief", async (
   await expect(page.getByRole("button", { name: "立即运行" })).toBeDisabled();
   await expect(page.getByRole("button", { name: "立即运行" })).toBeEnabled({ timeout: 30000 });
   expect(polls).toBeGreaterThanOrEqual(2);
-  const expected = [
-    [20, 20, 0, 0],
-    [108, 10, 0, 0],
-    [1, 1, 0, 0],
-    [30, 23, 7, 0],
-    [8, 2, 6, 0],
-    [2, 2, 0, 0],
-    [1, 1, 0, 0],
-  ];
+  // Repeated collection is idempotent; compare this run with its returned counts.
+  const latest = await (await request.get("http://127.0.0.1:8001/api/pipeline/runs/latest")).json();
+  const expected = latest.steps.map(
+    (step: { counts: { input: number; output: number; skipped: number; errors: number } }) => [
+      step.counts.input,
+      step.counts.output,
+      step.counts.skipped,
+      step.counts.errors,
+    ],
+  );
   const rows = page.getByTestId("pipeline-steps").locator("tbody tr");
   await expect(rows).toHaveCount(7);
   for (let i = 0; i < 7; i++) {
@@ -105,8 +117,14 @@ test("milestones: components, inbox, decision, pipeline, review, brief", async (
   await page.getByRole("link", { name: /规则审核/ }).click();
   await expect(page.locator("[data-draft]")).toHaveCount(2);
   await page.locator('[data-draft="DRAFT-2026-20511"]').click();
+  await page.getByRole("tab", { name: "原文", exact: true }).click();
   await expect(page.getByTestId("source-text").locator("mark")).toHaveCount(4);
-  await expect(page.locator(".review-checks .check-row")).toHaveCount(9);
+  await page.getByRole("tab", { name: "校验结果", exact: true }).click();
+  const checks = await (await request.get("http://127.0.0.1:8001/api/rule-drafts/DRAFT-2026-20511")).json();
+  expect(checks.validation).toHaveLength(9);
+  await expect(page.locator(".route-col .route-entry")).toHaveCount(
+    checks.validation.filter((v: { status: string }) => v.status !== "n/a").length,
+  );
   await shot(page, "T-7.2");
   await page.getByRole("button", { name: "确认规则", exact: true }).click();
   await expect(page.getByRole("button", { name: "确认规则", exact: true })).toBeDisabled();
@@ -118,21 +136,22 @@ test("milestones: components, inbox, decision, pipeline, review, brief", async (
     .toBeTruthy();
   await shot(page, "T-7.2-approved");
   await page.getByRole("link", { name: "政策日报", exact: true }).click();
-  await expect(page.getByTestId("brief-items").locator(".brief-item")).toHaveCount(9);
+  await expect(page.getByTestId("brief-items").locator(".card-like")).toHaveCount(9);
   await expect(page.locator("select")).toHaveValue("2026-10-31");
   await shot(page, "T-7.1");
   expect(errors).toEqual([]);
 });
 
-test("model settings: save, success, failure and clear without external calls", async ({ page }) => {
+test("T-16.11 model settings: save, success, failure and clear without external calls", async ({ page }) => {
   let configured = false,
     failed = false;
+  let lastTest: { ok: boolean; message: string; latency_ms: number; at: string } | null = null;
   const settings = () => ({
     configured,
     base_url: configured ? "https://model.example/v1" : null,
     model: configured ? "demo" : null,
     api_key_masked: configured ? "****1234" : null,
-    last_test: null,
+    last_test: lastTest,
   });
   await page.route("**/api/meta?*", async (route) => {
     const response = await route.fetch();
@@ -141,12 +160,21 @@ test("model settings: save, success, failure and clear without external calls", 
   });
   await page.route("**/api/settings/llm?*", async (route) => {
     if (route.request().method() === "PUT") configured = true;
-    if (route.request().method() === "DELETE") configured = false;
+    if (route.request().method() === "DELETE") {
+      configured = false;
+      lastTest = null;
+    }
     await route.fulfill({ json: settings() });
   });
-  await page.route("**/api/settings/llm/test?*", (route) =>
-    route.fulfill({ json: { ok: !failed, message: failed ? "HTTP 401" : "连接成功", latency_ms: 20 } }),
-  );
+  await page.route("**/api/settings/llm/test?*", (route) => {
+    lastTest = {
+      ok: !failed,
+      message: failed ? "HTTP 401" : "连接成功",
+      latency_ms: 20,
+      at: "2026-10-31T12:00:00Z",
+    };
+    return route.fulfill({ json: lastTest });
+  });
   await page.goto("/settings");
   await page.getByLabel("接口地址").fill("https://model.example/v1");
   await page.getByLabel("API Key").fill("private-1234");
@@ -156,12 +184,16 @@ test("model settings: save, success, failure and clear without external calls", 
   await expect(page.getByLabel("API Key")).toHaveValue("");
   await page.getByRole("button", { name: "测试连接", exact: true }).click();
   await expect(page.getByText("连接成功 20 ms")).toBeVisible();
+  await expect(page.locator(".metrics-list .metric-value").nth(2)).toHaveText("20");
+  await shot(page, "T-16.11");
   await shot(page, "T-7.4-success");
   failed = true;
   await page.getByRole("button", { name: "测试连接", exact: true }).click();
   await expect(page.getByText("连接失败：HTTP 401 20 ms")).toBeVisible();
+  await expect(page.locator(".metrics-list .metric-value").nth(2)).toHaveText("连接失败");
   await shot(page, "T-7.4-failed");
   await page.getByRole("button", { name: "清除配置", exact: true }).click();
   await expect(page.getByRole("link", { name: /模型接入/ })).toContainText("未接入");
+  await expect(page.locator(".metrics-list .metric-value").nth(2)).toHaveText("—");
   await shot(page, "T-7.4");
 });

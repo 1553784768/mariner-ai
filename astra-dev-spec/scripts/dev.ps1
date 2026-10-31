@@ -11,16 +11,12 @@ if (-not (Test-Path -LiteralPath $pythonPath) -or -not (Test-Path -LiteralPath $
 }
 $artifactRoot = Join-Path $projectRoot 'artifacts'
 New-Item -ItemType Directory -Force -Path $artifactRoot | Out-Null
-$managedVariables = 'NEXT_TELEMETRY_DISABLED','NEXT_PUBLIC_API_BASE','COLLECTOR_MODE','AS_OF_DATE','SCHEDULER_ENABLED','NEXT_FONT_GOOGLE_MOCKED_RESPONSES'
+$managedVariables = 'NEXT_TELEMETRY_DISABLED','NEXT_PUBLIC_API_BASE','COLLECTOR_MODE','AS_OF_DATE','SCHEDULER_ENABLED'
 $previousValues = @{}
 foreach ($name in $managedVariables) { $previousValues[$name] = [Environment]::GetEnvironmentVariable($name, 'Process') }
 $env:NEXT_TELEMETRY_DISABLED = '1'
 $env:NEXT_PUBLIC_API_BASE = 'http://127.0.0.1:8000'
 if ($Fixture) {
-    & $nodePath (Join-Path $projectRoot 'scripts/prepare-test-fonts.cjs') | Out-Null
-    if ($LASTEXITCODE -ne 0) { throw 'Failed to prepare offline font fixtures.' }
-    # Preserve Unicode paths without decoding native stdout in a background shell.
-    $env:NEXT_FONT_GOOGLE_MOCKED_RESPONSES = Join-Path $artifactRoot 'font-responses.cjs'
     $env:COLLECTOR_MODE = 'fixture'
     $env:AS_OF_DATE = '2026-10-31'
     $env:SCHEDULER_ENABLED = 'false'

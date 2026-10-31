@@ -511,3 +511,63 @@
 | extract/2026-20510/summary_en | 中国技术转让 301 措施未终止、继续有效，之后可能因四年审查而修改；本次不改变任何税率。 | The China technology-transfer Section 301 actions have not terminated and remain in effect; they may change after the four-year review; this notice changes no rate. |
 | import/338b5ec0c948576e90b5e03031fe43503574fcc3c8e93e8f02b04f6bb7ad5115/notes_en | 从图片识别出 2 行订单。 | Recognized 2 order rows from the image. |
 | chat/why is o5 red? | O5（微型电机）重算后亏损，所以是红色。它原来适用 301 排除，但排除只覆盖 2026-11-09 及以前入境的货物，O5 预计 2026-11-16 入境，新税率 41.9%，关税增量 +$16,000.00，利润由 $8,473.57 变为 −$7,526.43。 | O5 (small electric motors) shows a loss after recalculation, so it is red. It relied on a Section 301 exclusion that only covers goods entered by 2026-11-09, but O5 is expected to enter on 2026-11-16. The new rate is 41.9%, duty rises by +$16,000.00, and profit goes from $8,473.57 to −$7,526.43. |
+
+
+## v0.3 界面文案（2026-10-31）
+
+以下表格来自 V03_DESIGN §11，全部加入前端 zh / en 词表。保留已有术语大小写和译名，如 Profit、Critical Events、Pending、Pending approval、Needs Detail、Approved、Rejected。
+
+实现中的日期占位符统一为 `{date}`；知识类型统一为 `{type}`；`{n}月` 在时间轴中按月份序号映射 Jan–Dec。月份文案不是业务计算。
+
+
+| 中文 | 英文 |
+|---|---|
+| 税则 {hts_release} | HTS {hts_release} |
+| 税率 {base} → {new} | Rate {base} → {new} |
+| 红色风险 / 橙色风险 / 黄色风险 / 绿色风险 | Red risk / Orange risk / Yellow risk / Green risk |
+| 原因：{text} | Reason: {text} |
+| 综合税率 {a} → {b}，关税增量 {d}；利润 {p0} → {p1}，毛利率 {m0} → {m1}。 | Combined rate {a} → {b}, duty change {d}; profit {p0} → {p1}, margin {m0} → {m1}. |
+| 综合税率 {new}（原 {base}） | Combined rate {new} (was {base}) |
+| 报价日 | Quote date |
+| 今天 | Today |
+| 规则边界 | Rule boundary |
+| 规则边界 {MM-DD} | Rule boundary {MM-DD} |
+| {n}月 | Jan … Dec |
+| 税率分层 | Duty layers |
+| 利润（标签页） | Profit |
+| 没有不通过项 | No failed checks |
+| 没有注意项 | No warnings |
+| 没有通过项 | No passed checks |
+| 暂无临界事件 | No critical events |
+| 暂无处理记录 | No decisions yet |
+| {n} 待处理 | {n} pending |
+| {n} 红色 | {n} red |
+| {n} 紧急 | {n} urgent |
+| {n} 临界事件 | {n} critical events |
+| 政策日报 {date} | Policy brief {date} |
+| 生成于 {MM-DD HH:mm} | Generated {MM-DD HH:mm} |
+| 订单汇总 | Order summary |
+| 美国关税政策日报 | U.S. Tariff Policy Brief |
+| 结论按生成时的订单状态计算，之后的决策和重算不会更新这句话。 | This conclusion reflects order status when the brief was generated. Later decisions and recalculations do not update it. |
+| 类型 | Type |
+| {类型} · 更新于 {MM-DD HH:mm} | {type} · Updated {MM-DD HH:mm} |
+| {n} 待确认 / {n} 需补充 / {n} 已确认 / {n} 已驳回 | {n} to confirm / {n} needs detail / {n} approved / {n} rejected |
+| 不适用：{list} | N/A: {list} |
+| 受影响订单 | Affected orders |
+| 步骤 | Steps |
+| 动作 | Action |
+| 执行者 | Actor |
+| 摘要 | Summary |
+| 还没有运行记录 | No runs yet |
+| 连接状态 | Connection |
+| 连接失败 | Connection failed |
+
+英文已有译名的词（如「临界事件」Critical Events、「待处理」Pending）沿用现有译名；上表与现有译名冲突时，以现有译名为准，并在 `docs/i18n-review.md` 中注明。
+
+### 补充与冲突说明
+
+- §6.5 的「预估影响」标签页：Estimated impact。
+- §6.2 的「文件未导入，请修正以下错误」：The file was not imported. Fix the following errors.
+- V021 的「无法连接模型服务」：Unable to connect to the model service。
+- V03_DESIGN §11 要求已有译名优先，因此审核筛选行沿用 Pending approval / Needs Detail / Approved / Rejected；工作台统计沿用 Pending / Red / Urgent / Critical Events。
+- 英文验收保留订单品名、用户编辑内容和政策原文等数据的原始语言；其余静态控件文案检查不得残留中文（语言切换「中」除外）。

@@ -276,4 +276,57 @@ const messages: Record<string, string> = {
   请求参数不合法: "请求参数不合法",
   "采纳建议（{n}）": "采纳建议（{n}）",
 };
+messages["税则 {hts_release}"] = "税则 {hts_release}";
+messages["税率 {base} → {new}"] ??= "税率 {base} → {new}";
+messages["红色风险"] ??= "红色风险";
+messages["橙色风险"] ??= "橙色风险";
+messages["黄色风险"] ??= "黄色风险";
+messages["绿色风险"] ??= "绿色风险";
+messages["原因：{text}"] ??= "原因：{text}";
+messages["综合税率 {a} → {b}，关税增量 {d}；利润 {p0} → {p1}，毛利率 {m0} → {m1}。"] ??=
+  "综合税率 {a} → {b}，关税增量 {d}；利润 {p0} → {p1}，毛利率 {m0} → {m1}。";
+messages["综合税率 {new}（原 {base}）"] ??= "综合税率 {new}（原 {base}）";
+messages["报价日"] ??= "报价日";
+messages["今天"] ??= "今天";
+messages["规则边界"] ??= "规则边界";
+messages["规则边界 {date}"] ??= "规则边界 {date}";
+messages["{n}月"] ??= "{n}月";
+messages["税率分层"] ??= "税率分层";
+messages["利润"] ??= "利润";
+messages["没有不通过项"] ??= "没有不通过项";
+messages["没有注意项"] ??= "没有注意项";
+messages["没有通过项"] ??= "没有通过项";
+messages["暂无临界事件"] ??= "暂无临界事件";
+messages["暂无处理记录"] ??= "暂无处理记录";
+messages["{n} 待处理"] ??= "{n} 待处理";
+messages["{n} 红色"] ??= "{n} 红色";
+messages["{n} 紧急"] ??= "{n} 紧急";
+messages["{n} 临界事件"] ??= "{n} 临界事件";
+messages["政策日报 {date}"] ??= "政策日报 {date}";
+messages["生成于 {date}"] ??= "生成于 {date}";
+messages["订单汇总"] ??= "订单汇总";
+messages["美国关税政策日报"] ??= "美国关税政策日报";
+messages["结论按生成时的订单状态计算，之后的决策和重算不会更新这句话。"] ??=
+  "结论按生成时的订单状态计算，之后的决策和重算不会更新这句话。";
+messages["类型"] ??= "类型";
+messages["{type} · 更新于 {date}"] ??= "{type} · 更新于 {date}";
+messages["{n} 待确认"] ??= "{n} 待确认";
+messages["{n} 需补充"] ??= "{n} 需补充";
+messages["{n} 已确认"] ??= "{n} 已确认";
+messages["{n} 已驳回"] ??= "{n} 已驳回";
+messages["不适用：{list}"] ??= "不适用：{list}";
+messages["受影响订单"] ??= "受影响订单";
+messages["步骤"] ??= "步骤";
+messages["动作"] ??= "动作";
+messages["执行者"] ??= "执行者";
+messages["摘要"] ??= "摘要";
+messages["还没有运行记录"] ??= "还没有运行记录";
+messages["连接状态"] ??= "连接状态";
+messages["连接失败"] ??= "连接失败";
+messages["（"] ??= "（";
+messages["）"] ??= "）";
+messages["暂无税率"] ??= "暂无税率";
+messages["预估影响"] ??= "预估影响";
+messages["文件未导入，请修正以下错误"] ??= "文件未导入，请修正以下错误";
+messages["无法连接模型服务"] ??= "无法连接模型服务";
 export default messages;

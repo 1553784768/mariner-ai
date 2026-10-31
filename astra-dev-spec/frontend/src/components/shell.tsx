@@ -1,9 +1,11 @@
 "use client";
+import Image from "next/image";
+import Link from "next/link";
 import { t } from "@/i18n/runtime";
 import { useI18n } from "@/i18n";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState, type ReactNode } from "react";
+import { Suspense, useEffect, useRef, useState, type ReactNode } from "react";
 import {
   IconInbox,
   IconNews,
@@ -12,12 +14,73 @@ import {
   IconPlugConnected,
   IconBook,
   IconMessageChatbot,
+  IconFileText,
+  IconSearch,
 } from "@tabler/icons-react";
 import { api, type Schema } from "@/lib/api";
 import { formatTime } from "@/lib/format";
-import { BrandBlock, SidebarNavItem, SidebarStatCard, Tag, ErrorBanner } from "./ui";
+import { modifierLabel } from "@/lib/platform";
+import { ErrorBanner } from "./ui";
+import { APP_VERSION } from "@/lib/version";
 export function useMeta() {
   return useQuery({ queryKey: ["meta"], queryFn: () => api<Schema<"Meta">>("/meta") });
+}
+function SidebarSearch() {
+  const pathname = usePathname(),
+    router = useRouter(),
+    params = useSearchParams();
+  const urlQuery = params.get("q") || "";
+  const [input, setInput] = useState(urlQuery);
+  const [previousQuery, setPreviousQuery] = useState(urlQuery);
+  if (previousQuery !== urlQuery) {
+    setPreviousQuery(urlQuery);
+    setInput(urlQuery);
+  }
+  const ref = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (
+        (e.ctrlKey || e.metaKey) &&
+        e.key.toLowerCase() === "k" &&
+        !document.querySelector('[role="dialog"]')
+      ) {
+        e.preventDefault();
+        ref.current?.focus();
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, []);
+  useEffect(() => {
+    if (pathname !== "/inbox" || input === urlQuery) return;
+    const timer = setTimeout(() => {
+      const next = new URLSearchParams(params.toString());
+      if (input) next.set("q", input);
+      else next.delete("q");
+      next.delete("order");
+      router.replace(`/inbox?${next}`, { scroll: false });
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [input, urlQuery, pathname, router, params]);
+  return (
+    <div className="search-box">
+      <IconSearch size={14} />
+      <input
+        ref={ref}
+        aria-label={t("搜索订单号、品名、HS 编码…")}
+        placeholder={t("搜索订单号、品名、HS 编码…")}
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" && pathname !== "/inbox") {
+            e.preventDefault();
+            router.push(`/inbox?q=${encodeURIComponent(input)}`);
+          }
+        }}
+      />
+      <kbd className="kbd font-sans">{modifierLabel()} K</kbd>
+    </div>
+  );
 }
 export function Shell({
   title,
@@ -34,9 +97,12 @@ export function Shell({
   const [time, setTime] = useState("");
   useEffect(() => {
     const update = () => setTime(formatTime(new Date().toISOString()));
-    update();
-    const id = setInterval(update, 1000);
-    return () => clearInterval(id);
+    const initial = setTimeout(update, 0);
+    const timer = setInterval(update, 1000);
+    return () => {
+      clearTimeout(initial);
+      clearInterval(timer);
+    };
   }, []);
   const links = [
     { href: "/", title: t("工作台"), icon: <IconMessageChatbot /> },
@@ -50,78 +116,108 @@ export function Shell({
       count: meta.data?.counts.drafts_pending,
     },
     { href: "/pipeline", title: t("智能体流水线"), icon: <IconGitMerge /> },
-    {
-      href: "/settings",
-      title: t("模型接入"),
-      icon: <IconPlugConnected />,
-      hint: meta.data?.llm_configured ? t("已接入") : t("未接入"),
-    },
   ];
+  const today = meta.data?.today;
   return (
-    <div className="workspace">
-      <aside className="sidebar">
-        <BrandBlock release={meta.data?.hts_release} />
-        <p className="workspace-label label-mono label-zh">{t("工作区")}</p>
-        <nav>
-          {links.map((l) => (
-            <SidebarNavItem
-              key={l.href}
-              href={l.href}
-              active={pathname === l.href}
-              icon={l.icon}
-              count={l.count}
-              hint={l.hint}
-            >
-              {l.title}
-            </SidebarNavItem>
-          ))}
-        </nav>
-        <div className="sidebar-bottom">
-          {meta.data && <SidebarStatCard today={meta.data.today} />}
-          <div className="user-block">
-            <span>{t("本")}</span>
-            {t("本地用户")}
-          </div>
-          <div className="language-switch brut-sm">
-            <button aria-pressed={lang === "zh"} onClick={() => setLang("zh")}>
-              {t("中")}
-            </button>
-            <button aria-pressed={lang === "en"} onClick={() => setLang("en")}>
-              EN
-            </button>
-          </div>
+    <div className="app-shell">
+      <header className="topbar">
+        <div className="topbar-org">
+          <Image className="org-logo" src="/favicon.png" width={26} height={26} alt="" priority />
+          <span className="org-name">Mariner AI</span>
+          <span className="plan-badge">v{APP_VERSION}</span>
         </div>
-      </aside>
-      <main className="workspace-main">
-        <header className="topbar">
-          <div>
-            <div className="heading-line">
-              <h1>{title}</h1>
-              {pathname === "/inbox" && meta.data && (
-                <>
-                  <Tag>
-                    {meta.data.counts.pending}
-                    {t("待处理")}
-                  </Tag>
-                  <Tag tone="bad">
-                    {meta.data.counts.red}
-                    {t("红色")}
-                  </Tag>
-                </>
-              )}
-            </div>
-            <p className="font-mono time-line">
-              {t("北京时间")}
-              {time || "—"}
-              {t("· 计算批次")}
-              {meta.data?.latest_run?.id || "—"}
-            </p>
+        <div className="topbar-main">
+          <div className="project-picker">
+            <span className="project-mark">
+              <IconFileText />
+            </span>
+            {t("税则 {hts_release}", { hts_release: meta.data?.hts_release || "—" })}
           </div>
-          <div className="topbar-actions">{actions}</div>
-        </header>
-        {meta.error && <ErrorBanner error={meta.error} retry={() => meta.refetch()} />}
-        {children}
-      </main>
+          <h1 className="topbar-title">{title}</h1>
+          <span className="topbar-clock">
+            {t("北京时间")} {time || "—"}
+          </span>
+        </div>
+      </header>
+      <div className="layout">
+        <aside className="sidebar">
+          <Suspense>
+            <SidebarSearch />
+          </Suspense>
+          <nav className="nav-list">
+            {links.map((l) => (
+              <Link
+                key={l.href}
+                href={l.href}
+                className={`nav-item${pathname === l.href ? " active" : ""}`}
+                aria-current={pathname === l.href ? "page" : undefined}
+              >
+                {l.icon}
+                <span>{l.title}</span>
+                {l.count !== undefined && <span className="nav-count">{l.count}</span>}
+              </Link>
+            ))}
+          </nav>
+          <div className="sidebar-bottom">
+            {today && (
+              <div className="today-card">
+                <div className="today-label">{t("今日已处理")}</div>
+                <div className="today-value">
+                  {today.processed}
+                  <small>
+                    / {today.total} {t("单")}
+                  </small>
+                </div>
+                <div className="stack-bar">
+                  {(["adopted", "dismissed", "needs_detail"] as const).map((key, i) => (
+                    <i
+                      key={key}
+                      style={{
+                        width: `${today.total ? (today[key] / today.total) * 100 : 0}%`,
+                        background: `var(--color-${["good", "bad", "warn"][i]})`,
+                      }}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+            <Link
+              className={`nav-item${pathname === "/settings" ? " active" : ""}`}
+              aria-current={pathname === "/settings" ? "page" : undefined}
+              href="/settings"
+            >
+              <IconPlugConnected />
+              <span>{t("模型接入")}</span>
+              <span className="nav-hint">{meta.data?.llm_configured ? t("已接入") : t("未接入")}</span>
+            </Link>
+            <div className="sidebar-profile">
+              <span className="profile-avatar">{t("本")}</span>
+              <span className="profile-name">{t("本地用户")}</span>
+              <div className="segmented mini">
+                <button
+                  className={lang === "zh" ? "active" : ""}
+                  aria-pressed={lang === "zh"}
+                  onClick={() => setLang("zh")}
+                >
+                  {t("中")}
+                </button>
+                <button
+                  className={lang === "en" ? "active" : ""}
+                  aria-pressed={lang === "en"}
+                  onClick={() => setLang("en")}
+                >
+                  EN
+                </button>
+              </div>
+            </div>
+          </div>
+        </aside>
+        <main className="content">
+          {actions && <div className="filter-row">{actions}</div>}
+          {meta.error && <ErrorBanner error={meta.error} retry={() => meta.refetch()} />}
+          {children}
+        </main>
+      </div>
     </div>
   );
 }

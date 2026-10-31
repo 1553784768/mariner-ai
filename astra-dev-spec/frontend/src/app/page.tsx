@@ -2,17 +2,24 @@
 import { t } from "@/i18n/runtime";
 import Link from "next/link";
 import { Suspense, useEffect, useRef, useState } from "react";
-import { IconPaperclip, IconTrash } from "@tabler/icons-react";
+import {
+  IconPaperclip,
+  IconTrash,
+  IconNews,
+  IconRefresh,
+  IconSend,
+  IconAlertTriangle,
+} from "@tabler/icons-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api, ApiFailure, type Schema } from "@/lib/api";
 import type { ChatMessage, Conversation } from "@/lib/v02";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { ConversationSummary } from "@/lib/v02";
-import { legalLabels } from "@/lib/labels";
+import { formatTime } from "@/lib/format";
 import { useI18n } from "@/i18n";
 import { Shell, useMeta } from "@/components/shell";
 import { ImportPreview } from "@/components/import-preview";
-import { ErrorBanner, LoadingPanel, PrimaryButton, Tag } from "@/components/ui";
+import { ErrorBanner, LoadingPanel, PrimaryButton, EmptyPanel, Switch } from "@/components/ui";
 
 function Workbench() {
   const { lang } = useI18n(),
@@ -125,194 +132,233 @@ function Workbench() {
   const submit = () => {
     if (text.trim() && !busy) send.mutate({ cid: conversation.data!.id, question: text.trim() });
   };
+  const active = conversations.data?.find((item) => item.id === conversation.data?.id);
+  const error =
+    conversations.error ||
+    conversation.error ||
+    fresh.error ||
+    remove.error ||
+    send.error ||
+    uploadError ||
+    watches.error ||
+    brief.error;
   return (
     <Shell title={t("工作台")}>
-      <div className="workbench-layout grid-doc">
-        <section className="chat-panel brut-lg">
-          <aside className="conversation-history" aria-label={t("对话记录")}>
-            <h2>{t("对话记录")}</h2>
-            <button className="secondary-button brut-sm" disabled={pending} onClick={() => fresh.mutate()}>
+      <div className="filter-row">
+        <Link className="stat-chip" href="/inbox">
+          <span className="dot muted" />
+          <b>{meta.data?.counts.pending ?? "—"}</b>
+          {t("待处理")}
+        </Link>
+        <span className="stat-chip">
+          <span className="dot bad" />
+          <b>{meta.data?.counts.red ?? "—"}</b>
+          {t("红色")}
+        </span>
+        <Link className="stat-chip" href="/inbox?tab=urgent">
+          <span className="dot warn" />
+          <b>{meta.data?.counts.urgent ?? "—"}</b>
+          {t("紧急")}
+        </Link>
+        <Link className="stat-chip" href="/inbox#watch-events">
+          <span className="dot caution" />
+          <b>{watches.data?.length ?? "—"}</b>
+          {t("临界事件")}
+        </Link>
+        <span className="spacer" />
+        {brief.data && (
+          <Link className="date-range" href="/brief">
+            <IconNews />
+            {t("政策日报 {date}", { date: brief.data.date })}
+          </Link>
+        )}
+      </div>
+      {error && (
+        <ErrorBanner
+          error={error}
+          retry={() => {
+            void conversation.refetch();
+            void conversations.refetch();
+            void brief.refetch();
+            void watches.refetch();
+            if (fresh.error) fresh.mutate();
+            if (remove.error && remove.variables) remove.mutate(remove.variables);
+            if (send.error && send.variables) send.mutate(send.variables);
+            if (uploadError && upload.variables) upload.mutate(upload.variables);
+          }}
+        />
+      )}
+      <div className="panels fill">
+        <aside className="metrics-list" aria-label={t("对话记录")}>
+          <div className="list-head">
+            <button className="btn btn-block" disabled={pending} onClick={() => fresh.mutate()}>
               {t("+ 新对话")}
             </button>
-            {conversations.error && <ErrorBanner error={conversations.error} />}
-            {conversations.data?.length === 0 && <p>{t("还没有对话")}</p>}
-            {conversations.data?.map((item) => (
-              <div
-                key={item.id}
-                className="conversation-item"
-                data-active={item.id === conversation.data?.id}
+          </div>
+          {conversations.isPending && <LoadingPanel />}
+          {conversations.data?.length === 0 && <EmptyPanel>{t("还没有对话")}</EmptyPanel>}
+          {conversations.data?.map((item) => (
+            <div
+              className={`conv-item${item.id === conversation.data?.id ? " active" : ""}`}
+              data-active={item.id === conversation.data?.id}
+              key={item.id}
+            >
+              <button
+                className="conv-text"
+                style={{ textAlign: "left" }}
+                disabled={pending}
+                onClick={() => {
+                  setText("");
+                  router.push(`/?c=${item.id}`, { scroll: false });
+                }}
               >
-                <button
-                  className="conversation-select"
-                  disabled={pending}
-                  onClick={() => {
-                    setText("");
-                    router.push(`/?c=${item.id}`, { scroll: false });
-                  }}
-                >
-                  <span>{item.title}</span>
-                  <time>{new Date(item.updated_at).toLocaleString("sv-SE").slice(5, 16)}</time>
-                </button>
-                <button
-                  className="conversation-delete"
-                  aria-label={`${t("删除")} ${item.title}`}
-                  disabled={pending}
-                  onClick={() => {
-                    if (confirm(t("确定删除这段对话吗？"))) remove.mutate(item.id);
-                  }}
-                >
-                  <IconTrash size={16} />
-                </button>
-              </div>
-            ))}
-          </aside>
-          <div className="chat-main">
-            <div className="section-heading">
-              <h2>{t("工作台")}</h2>
+                <span className="conv-title">{item.title}</span>
+                <span className="conv-time" style={{ display: "block" }}>
+                  {formatTime(item.updated_at).slice(5)}
+                </span>
+              </button>
+              <button
+                className="icon-btn ghost"
+                aria-label={`${t("删除")} ${item.title}`}
+                disabled={pending}
+                onClick={() => {
+                  if (confirm(t("确定删除这段对话吗？"))) remove.mutate(item.id);
+                }}
+              >
+                <IconTrash />
+              </button>
             </div>
-            {(fresh.error || remove.error) && <ErrorBanner error={(fresh.error || remove.error)!} />}
+          ))}
+        </aside>
+        <section className="chat">
+          {conversation.data && (
+            <div className="chat-head">
+              <h2 className="chat-title">{active?.title || t("新对话")}</h2>
+              <span className="device-tag" style={{ marginBottom: 0 }}>
+                {active?.created_at
+                  ? formatTime(active.created_at).slice(5)
+                  : conversation.data.created_at
+                    ? formatTime(conversation.data.created_at).slice(5)
+                    : "—"}
+              </span>
+            </div>
+          )}
+          <div className="chat-scroll" aria-live="polite">
             {!meta.data?.llm_configured && (
-              <p className="source-banner tone-warn-soft brut-sm">
+              <div className="banner warn">
+                <IconAlertTriangle />
                 {t("未配置模型：只能回答内置示例问题。")}
+                <span className="spacer" />
                 <Link href="/settings">{t("去配置 →")}</Link>
-              </p>
+              </div>
             )}
-            {(conversation.error || send.error || uploadError) && (
-              <ErrorBanner error={(conversation.error || send.error || uploadError)!} />
+            {conversation.isPending && <LoadingPanel />}
+            {conversation.data?.messages.map((message, index) => (
+              <article
+                key={message.id}
+                className={`msg ${message.error ? "error" : message.role}`}
+                style={message.import_job_id ? { maxWidth: "100%", width: "100%" } : undefined}
+              >
+                {message.guard && !message.guard.ok && (
+                  <div className="banner bad">
+                    {t("回答中有知识库里找不到的数字：")}
+                    {message.guard.unknown_numbers.join(t("、"))}
+                    {t("，请以订单影响单为准")}
+                  </div>
+                )}
+                {!message.import_job_id && <p>{message.text}</p>}
+                {message.error && (
+                  <button
+                    className="btn"
+                    style={{ marginTop: 8 }}
+                    disabled={busy}
+                    onClick={() => {
+                      const question = conversation
+                        .data!.messages.slice(0, index)
+                        .reverse()
+                        .find((v) => v.role === "user")?.text;
+                      if (question) send.mutate({ cid: conversation.data!.id, question });
+                    }}
+                  >
+                    <IconRefresh />
+                    {t("重试")}
+                  </button>
+                )}
+                {!!message.citations.length && (
+                  <div className="chips">
+                    {message.citations.map((citation) => (
+                      <Link
+                        className="chip brand"
+                        key={citation.id}
+                        href={`/knowledge?id=${encodeURIComponent(citation.id)}`}
+                      >
+                        {citation.title}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+                {message.import_job_id && <ImportPreview id={message.import_job_id} />}
+              </article>
+            ))}
+            {send.isPending && (
+              <div className="msg assistant" style={{ color: "var(--color-ink-400)" }} role="status">
+                {t("思考中…")}
+              </div>
             )}
-            <div className="chat-messages" aria-live="polite">
-              {conversation.data?.messages.map((message, index) => (
-                <article
-                  key={message.id}
-                  className={`chat-message chat-${message.role}${message.error ? " chat-error" : ""}`}
-                >
-                  {message.guard && !message.guard.ok && (
-                    <p className="source-banner tone-bad">
-                      {t("回答中有知识库里找不到的数字：")}
-                      {message.guard.unknown_numbers.join("、")}
-                      {t("，请以订单影响单为准")}
-                    </p>
-                  )}
-                  {!message.import_job_id && <p>{message.text}</p>}
-                  {message.error && (
-                    <button
-                      className="secondary-button brut-sm"
-                      disabled={busy}
-                      onClick={() => {
-                        const question = conversation
-                          .data!.messages.slice(0, index)
-                          .reverse()
-                          .find((v) => v.role === "user")?.text;
-                        if (question) send.mutate({ cid: conversation.data!.id, question });
-                      }}
-                    >
-                      {t("重试")}
-                    </button>
-                  )}
-                  {!!message.citations.length && (
-                    <div className="tags">
-                      <span>{t("引用")}</span>
-                      {message.citations.map((citation) => (
-                        <Link
-                          className="tag brut-sm"
-                          key={citation.id}
-                          href={`/knowledge?id=${encodeURIComponent(citation.id)}`}
-                        >
-                          {citation.title}
-                        </Link>
-                      ))}
-                    </div>
-                  )}
-                  {message.import_job_id && <ImportPreview id={message.import_job_id} />}
-                </article>
-              ))}
-              {send.isPending && <p role="status">{t("思考中…")}</p>}
-            </div>
-            <div className="chat-composer">
-              <label>
-                <input type="checkbox" checked={orderData} onChange={(e) => setOrderData(e.target.checked)} />
-                {t("对话可使用订单数据")}
-              </label>
-              {orderData && (
-                <p className="source-banner tone-warn-soft">
-                  {t("开启后，检索到的订单和影响单内容会发送给模型")}
-                  {settings.data?.model || t("内置夹具")}
-                </p>
-              )}
-              <textarea
-                placeholder={t("输入问题，或上传订单文件…")}
-                value={text}
-                onChange={(e) => setText(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
-                    e.preventDefault();
-                    submit();
+          </div>
+          <div className="chat-input">
+            <Switch checked={orderData} onChange={setOrderData}>
+              {t("对话可使用订单数据")}
+            </Switch>
+            {orderData && (
+              <div className="banner info">
+                {t("开启后，检索到的订单和影响单内容会发送给模型")} {settings.data?.model || t("内置夹具")}
+              </div>
+            )}
+            <textarea
+              className="textarea"
+              rows={3}
+              placeholder={t("输入问题，或上传订单文件…")}
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
+                  e.preventDefault();
+                  submit();
+                }
+              }}
+            />
+            <div className="row">
+              <input
+                ref={attachment}
+                type="file"
+                hidden
+                accept=".csv,.xlsx,.pdf,.png,.jpg,.jpeg"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    setUploadError(null);
+                    upload.mutate({ file, cid: conversation.data!.id });
                   }
+                  e.target.value = "";
                 }}
               />
-              <div className="button-row">
-                <input
-                  ref={attachment}
-                  type="file"
-                  hidden
-                  accept=".csv,.xlsx,.pdf,.png,.jpg,.jpeg"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    if (file) {
-                      setUploadError(null);
-                      upload.mutate({ file, cid: conversation.data!.id });
-                    }
-                    e.target.value = "";
-                  }}
-                />
-                <button
-                  aria-label="attachment"
-                  className="secondary-button brut-sm"
-                  disabled={busy}
-                  onClick={() => attachment.current?.click()}
-                >
-                  <IconPaperclip />
-                </button>
-                <PrimaryButton disabled={busy || !text.trim()} onClick={submit}>
-                  {t("发送")}
-                </PrimaryButton>
-              </div>
+              <button
+                aria-label="attachment"
+                className="icon-btn"
+                disabled={busy}
+                onClick={() => attachment.current?.click()}
+              >
+                <IconPaperclip />
+              </button>
+              <span className="spacer" />
+              <PrimaryButton disabled={busy || !text.trim()} onClick={submit}>
+                <IconSend />
+                {t("发送")}
+              </PrimaryButton>
             </div>
           </div>
         </section>
-        <aside className="workbench-context">
-          <section className="paper-document brut">
-            <h2>{t("风险收件箱")}</h2>
-            <div className="tags">
-              <Tag>
-                {meta.data?.counts.pending ?? 0}
-                {t("待处理")}
-              </Tag>
-              <Tag tone="bad">
-                {meta.data?.counts.red ?? 0}
-                {t("红")}
-              </Tag>
-              <Tag tone="warn">
-                {meta.data?.counts.urgent ?? 0}
-                {t("紧急")}
-              </Tag>
-            </div>
-            <Link href="/inbox">{t("风险收件箱 →")}</Link>
-          </section>
-          <section className="paper-document brut">
-            <h2>{t("政策日报")}</h2>
-            <p>{brief.data?.conclusion}</p>
-            <Link href="/brief">{t("查看日报 →")}</Link>
-          </section>
-          <section className="paper-document brut">
-            <h2>{t("临界事件")}</h2>
-            {watches.data?.slice(0, 3).map((item) => (
-              <p key={item.id}>
-                <Tag>{legalLabels[item.legal_status]}</Tag> {item.title}
-              </p>
-            ))}
-          </section>
-        </aside>
       </div>
     </Shell>
   );

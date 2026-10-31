@@ -11,3 +11,5 @@ public
 .next-build/
 
 .next-e2e-v02/
+
+test-results-v03/

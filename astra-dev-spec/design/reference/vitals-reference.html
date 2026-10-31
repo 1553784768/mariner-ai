@@ -1,0 +1,681 @@
+<!doctype html>
+<!-- Source snapshot: https://agent.kombai.com/kombai-inspiration-library/app-pages/dashboards/web/2/index.html
+     Kombai gallery "Vitals" (kombai:import-screen:dashboards-web-2), fetched 2026-10-31.
+     Reference only. Do not ship this file. The external avatar image URL was removed. -->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ridgeline — Performance Insights</title>
+<style>
+  :root{
+    --ink-900:#101423;
+    --ink-800:#1b2032;
+    --ink-700:#333a4d;
+    --ink-500:#6b7182;
+    --ink-400:#8b91a2;
+    --ink-300:#c2c6d1;
+    --ink-200:#e2e4ea;
+    --ink-100:#eef0f4;
+    --surface:#f7f8fb;
+    --white:#ffffff;
+
+    --brand:#3d3aef;
+    --brand-dark:#26216b;
+    --brand-soft:#eceafd;
+
+    --good:#0a9a6b;
+    --good-soft:#e3f7ef;
+    --warn:#c8790a;
+    --warn-soft:#fdf1de;
+    --bad:#d13a53;
+    --bad-soft:#fbe7ea;
+
+    --radius-sm:6px;
+    --radius-md:10px;
+    --radius-lg:14px;
+
+    --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:var(--font);
+    background:var(--surface);
+    color:var(--ink-900);
+    -webkit-font-smoothing:antialiased;
+    font-size:14px;
+    line-height:1.45;
+  }
+  a{color:var(--brand);text-decoration:none;}
+  a:hover{text-decoration:underline;}
+  button{font-family:inherit;}
+  svg{display:block;}
+
+  .app-shell{
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+  }
+
+  /* ---------- Top bar ---------- */
+  .topbar{
+    display:flex;
+    align-items:stretch;
+    height:60px;
+    flex-shrink:0;
+    background:var(--white);
+    border-bottom:1px solid var(--ink-200);
+  }
+  .topbar-org{
+    width:264px;
+    flex-shrink:0;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:0 20px;
+    border-right:1px solid var(--ink-200);
+  }
+  .org-avatar{
+    width:26px;height:26px;border-radius:50%;
+    background:conic-gradient(from 200deg,#8f7bf2,#3d3aef 45%,#1de9b6 100%);
+    flex-shrink:0;
+  }
+  .org-name{
+    font-weight:600;
+    font-size:13.5px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .plan-badge{
+    font-size:11px;
+    font-weight:600;
+    color:var(--brand);
+    background:var(--brand-soft);
+    padding:2px 7px;
+    border-radius:999px;
+    white-space:nowrap;
+  }
+  .chev{color:var(--ink-400); flex-shrink:0;}
+
+  .topbar-main{
+    flex:1;
+    display:flex;
+    align-items:center;
+    padding:0 24px;
+    gap:16px;
+    min-width:0;
+  }
+  .project-picker{
+    display:flex;align-items:center;gap:8px;
+    font-weight:600;font-size:13.5px;
+    color:var(--ink-800);
+    white-space:nowrap;
+  }
+  .project-mark{
+    width:18px;height:18px;
+    border-radius:5px;
+    background:var(--ink-900);
+    display:flex;align-items:center;justify-content:center;
+  }
+  .project-mark svg{width:10px;height:10px;}
+
+  .topbar-title{
+    flex:1;
+    text-align:center;
+    font-weight:600;
+    font-size:14.5px;
+    color:var(--ink-800);
+  }
+  .topbar-more{
+    width:30px;height:30px;
+    display:flex;align-items:center;justify-content:center;
+    border-radius:var(--radius-sm);
+    color:var(--ink-600);
+    flex-shrink:0;
+  }
+
+  /* ---------- Layout ---------- */
+  .layout{
+    flex:1;
+    display:flex;
+    min-height:0;
+    align-items:stretch;
+  }
+
+  /* ---------- Sidebar ---------- */
+  .sidebar{
+    width:264px;
+    flex-shrink:0;
+    background:var(--white);
+    border-right:1px solid var(--ink-200);
+    display:flex;
+    flex-direction:column;
+    padding:16px 12px;
+  }
+  .search-box{
+    display:flex;align-items:center;gap:8px;
+    border:1px solid var(--ink-200);
+    border-radius:var(--radius-sm);
+    padding:8px 10px;
+    color:var(--ink-500);
+    font-size:13px;
+    margin-bottom:14px;
+  }
+  .search-box .kbd{
+    margin-left:auto;
+    font-size:11px;
+    color:var(--ink-400);
+    border:1px solid var(--ink-200);
+    border-radius:4px;
+    padding:1px 5px;
+  }
+
+  .nav-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:1px;}
+  .nav-item{
+    display:flex;align-items:center;gap:10px;
+    padding:8px 10px;
+    border-radius:var(--radius-sm);
+    color:var(--ink-700);
+    font-size:13.5px;
+    cursor:default;
+    position:relative;
+  }
+  .nav-item svg{width:16px;height:16px;flex-shrink:0;color:var(--ink-500);}
+  .nav-item .expand{margin-left:auto;color:var(--ink-400);}
+  .nav-item.active{
+    background:var(--brand-soft);
+    color:var(--brand-dark);
+    font-weight:600;
+  }
+  .nav-item.active svg{color:var(--brand);}
+  .nav-item.active::before{
+    content:"";
+    position:absolute;left:-12px;top:6px;bottom:6px;width:3px;
+    background:var(--brand);
+    border-radius:2px;
+  }
+  .nav-sep{height:12px;}
+
+  .sidebar-bottom{margin-top:auto;display:flex;flex-direction:column;gap:1px;}
+  .sidebar-profile{
+    display:flex;align-items:center;gap:10px;
+    padding:10px 8px;
+    margin-top:8px;
+    border-top:1px solid var(--ink-200);
+  }
+  .profile-avatar{
+    width:26px;height:26px;border-radius:50%;
+    background:linear-gradient(135deg,#ffb46b,#ef5da8);
+    flex-shrink:0;
+  }
+  .profile-name{font-size:13px;font-weight:600;flex:1;}
+  .profile-icons{display:flex;align-items:center;gap:10px;color:var(--ink-500);}
+  .dot-badge{position:relative;}
+  .dot-badge::after{
+    content:"";position:absolute;top:-2px;right:-2px;
+    width:6px;height:6px;border-radius:50%;background:var(--brand);
+  }
+
+  /* ---------- Content ---------- */
+  .content{
+    flex:1;
+    min-width:0;
+    padding:22px 28px 40px;
+    overflow-x:auto;
+  }
+
+  .filter-row{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    margin-bottom:20px;
+    flex-wrap:wrap;
+  }
+  .segmented{
+    display:flex;
+    background:var(--white);
+    border:1px solid var(--ink-200);
+    border-radius:var(--radius-sm);
+    padding:3px;
+    gap:2px;
+  }
+  .segmented button{
+    border:none;background:transparent;
+    padding:6px 16px;
+    border-radius:5px;
+    font-size:13px;
+    color:var(--ink-600);
+    cursor:default;
+  }
+  .segmented button.active{
+    background:var(--ink-900);
+    color:var(--white);
+    font-weight:600;
+  }
+  .dropdown{
+    display:flex;align-items:center;gap:8px;
+    background:var(--white);
+    border:1px solid var(--ink-200);
+    border-radius:var(--radius-sm);
+    padding:7px 12px;
+    font-size:13px;
+    color:var(--ink-800);
+    font-weight:500;
+  }
+  .dropdown svg{color:var(--ink-500);}
+  .spacer{flex:1;}
+  .date-range{
+    display:flex;align-items:center;gap:8px;
+    background:var(--white);
+    border:1px solid var(--ink-200);
+    border-radius:var(--radius-sm);
+    padding:7px 14px;
+    font-size:13px;
+    font-weight:500;
+  }
+  .date-range svg{color:var(--ink-500);}
+
+  .panels{
+    display:grid;
+    grid-template-columns:280px 1fr;
+    gap:0;
+    background:var(--white);
+    border:1px solid var(--ink-200);
+    border-radius:var(--radius-lg);
+    overflow:hidden;
+  }
+
+  /* ---- metrics list ---- */
+  .metrics-list{
+    border-right:1px solid var(--ink-200);
+    display:flex;flex-direction:column;
+  }
+  .metric-card{
+    padding:18px 20px;
+    border-bottom:1px solid var(--ink-200);
+    position:relative;
+  }
+  .metric-card.active{background:var(--surface);}
+  .metric-card.active::before{
+    content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--ink-900);
+  }
+  .metric-label{font-size:13.5px;font-weight:600;color:var(--ink-800);margin-bottom:12px;}
+  .metric-ring-row{display:flex;align-items:center;gap:10px;}
+  .metric-value-row{display:flex;align-items:baseline;gap:4px;margin-bottom:10px;}
+  .metric-value{font-size:22px;font-weight:700;}
+  .metric-unit{font-size:12px;color:var(--ink-500);}
+  .metric-bar{
+    height:4px;border-radius:2px;position:relative;
+    background:var(--ink-100);
+  }
+  .metric-bar > i{
+    position:absolute;left:0;top:0;bottom:0;border-radius:2px;
+  }
+  .metric-bar::after{
+    content:"";position:absolute;top:-3px;width:2px;height:10px;background:var(--ink-800);
+    border-radius:1px;
+  }
+  .metric-value.tone-bad{color:var(--bad);}
+  .metric-value.tone-good{color:var(--good);}
+  .metric-bar i.tone-bad{background:var(--bad);}
+  .metric-bar i.tone-good{background:var(--good);}
+
+  /* ---- detail panel ---- */
+  .detail-panel{display:flex;flex-direction:column;}
+  .detail-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    padding:22px 24px 8px;
+    gap:24px;
+    flex-wrap:wrap;
+  }
+  .detail-left{max-width:420px;}
+  .device-tag{font-size:12.5px;color:var(--ink-400);font-weight:600;margin-bottom:6px;}
+  .detail-heading{font-size:23px;font-weight:700;margin:0 0 16px;color:var(--ink-900);}
+  .score-row{display:flex;align-items:center;gap:16px;margin-bottom:14px;}
+  .score-status{font-size:15px;font-weight:700;margin-bottom:4px;}
+  .score-flag{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--warn);font-weight:600;}
+  .score-flag svg{width:13px;height:13px;}
+  .detail-copy{font-size:13.5px;color:var(--ink-700);margin:14px 0 0;}
+  .detail-copy.hint{color:var(--ink-500);padding-top:14px;margin-top:14px;border-top:1px solid var(--ink-200);}
+  .learn-link{display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:600;margin-top:10px;}
+  .learn-link svg{width:12px;height:12px;}
+
+  .legend-row{display:flex;align-items:center;gap:18px;flex-shrink:0;padding-top:2px;}
+  .legend-item{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ink-400);font-weight:600;}
+  .legend-dot{width:7px;height:7px;border-radius:50%;border:1.5px solid var(--ink-300);}
+  .legend-item.active{color:var(--ink-800);}
+  .legend-item.active .legend-dot{background:var(--brand);border-color:var(--brand);}
+
+  .chart-wrap{padding:6px 24px 20px;}
+  .chart-svg{width:100%;height:auto;display:block;}
+
+  .tabs-row{
+    display:flex;align-items:center;
+    padding:0 24px;
+    border-top:1px solid var(--ink-200);
+  }
+  .tab{
+    padding:14px 4px;margin-right:26px;
+    font-size:13.5px;font-weight:600;color:var(--ink-500);
+    border-bottom:2px solid transparent;
+    cursor:default;
+  }
+  .tab.active{color:var(--ink-900);border-bottom-color:var(--ink-900);}
+  .tabs-spacer{flex:1;}
+  .tabs-suffix{font-size:12px;font-weight:600;color:var(--ink-400);}
+
+  .route-grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+  }
+  .route-col{
+    border-right:1px solid var(--ink-200);
+    min-height:220px;
+    display:flex;flex-direction:column;
+  }
+  .route-col:last-child{border-right:none;}
+  .route-col-head{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:16px 20px;
+    font-size:13.5px;font-weight:700;
+  }
+  .route-col-head .tag{
+    display:flex;align-items:center;gap:6px;
+  }
+  .route-col-head svg{width:14px;height:14px;}
+  .route-col-head .range{font-weight:500;color:var(--ink-400);font-size:12.5px;}
+  .tag.bad{color:var(--bad);}
+  .tag.warn{color:var(--warn);}
+  .tag.good{color:var(--good);}
+
+  .route-entry{
+    margin:0 16px;
+    background:var(--surface);
+    border-radius:var(--radius-sm);
+    padding:12px 14px;
+    display:flex;align-items:center;
+    font-size:13.5px;
+  }
+  .route-path{font-weight:600;flex:1;}
+  .route-visits{color:var(--ink-400);font-size:12px;margin-right:14px;}
+  .route-score{font-weight:700;}
+
+  .route-empty{
+    flex:1;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    gap:10px;color:var(--ink-400);font-size:13px;
+    padding:20px;
+  }
+  .route-empty svg{width:26px;height:26px;color:var(--ink-300);}
+
+  @media (max-width:980px){
+    .sidebar{display:none;}
+    .topbar-org{width:190px;}
+    .panels{grid-template-columns:1fr;}
+    .metrics-list{border-right:none;border-bottom:1px solid var(--ink-200);flex-direction:row;overflow-x:auto;}
+    .metric-card{border-bottom:none;border-right:1px solid var(--ink-200);min-width:200px;}
+    .route-grid{grid-template-columns:1fr;}
+    .route-col{border-right:none;border-bottom:1px solid var(--ink-200);}
+  }
+  @media (max-width:640px){
+    .topbar-title{display:none;}
+    .content{padding:16px;}
+    .detail-top{padding:18px 16px 4px;}
+    .chart-wrap{padding:6px 16px 16px;}
+    .tabs-row{padding:0 16px;}
+  }
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+  <header class="topbar">
+    <div class="topbar-org">
+      <div class="org-avatar"></div>
+      <span class="org-name">avery-studio</span>
+      <span class="plan-badge">Pro Trial</span>
+      <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 8l5 5 5-5M7 15l5 5 5-5" opacity="0"/><path d="M8 9l4 4 4-4M8 15l4 4 4-4" stroke-width="1.6"/></svg>
+    </div>
+    <div class="topbar-main">
+      <div class="project-picker">
+        <span class="project-mark">
+          <svg viewBox="0 0 24 24" fill="none"><path d="M12 3l9 16H3L12 3z" fill="white"/></svg>
+        </span>
+        campaign-launch
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 9l4 4 4-4"/></svg>
+      </div>
+      <div class="topbar-title">Performance Insights</div>
+      <div class="topbar-more">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></svg>
+      </div>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="search-box">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        Search…
+        <span class="kbd">F</span>
+      </div>
+      <ul class="nav-list">
+        <li class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>Overview</li>
+        <li class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.7l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.7l7 4a2 2 0 002 0l7-4a2 2 0 001-1.7z"/><path d="M3.3 7l8.7 5 8.7-5M12 22V12"/></svg>Deployments</li>
+        <li class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Logs</li>
+        <li class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V9M12 19V5M20 19v-6"/></svg>Analytics</li>
+        <li class="nav-item active"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="13" r="8"/><path d="M12 13l3-4M12 5V3"/></svg>Performance Insights</li>
+        <li class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>Observability<svg class="expand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></li>
+        <li class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6l8-4z"/></svg>Firewall<svg class="expand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></li>
+        <li class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 010 18 14 14 0 010-18z"/></svg>CDN<svg class="expand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></li>
+        <div class="nav-sep"></div>
+        <li class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18"/></svg>Domains</li>
+        <li class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3v4M15 3v4M9 17v4M15 17v4M5 9h4M15 9h4M5 15h4M15 15h4"/><rect x="8" y="8" width="8" height="8" rx="1.5"/></svg>Integrations</li>
+        <li class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></svg>Storage</li>
+        <li class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9 15s1.2-2 3-2 3 2 3 2M9 9h.01M15 9h.01"/></svg>Flags<svg class="expand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></li>
+        <li class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="7" width="14" height="12" rx="2"/><path d="M9 3l1.5 4M15 3l-1.5 4"/><circle cx="9.5" cy="13" r="1"/><circle cx="14.5" cy="13" r="1"/></svg>Agent<svg class="expand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></li>
+        <li class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/></svg>AI Gateway<svg class="expand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></li>
+        <li class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L3 7v10l9 5 9-5V7l-9-5z"/><path d="M3 7l9 5 9-5M12 12v10"/></svg>Sandboxes</li>
+        <li class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="6" cy="6" r="3"/><circle cx="18" cy="18" r="3"/><path d="M8.5 7.5L15.5 16.5M6 9v3a3 3 0 003 3h3"/></svg>Workflows</li>
+      </ul>
+      <div class="sidebar-bottom">
+        <ul class="nav-list">
+          <li class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>Usage</li>
+          <li class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9.1 9a3 3 0 115.5 1.6c-.9 1.4-2.6 1.6-2.6 3.4M12 17h.01"/></svg>Support</li>
+          <li class="nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.9l.1.1a2 2 0 11-2.9 2.9l-.1-.1a1.7 1.7 0 00-1.9-.3 1.7 1.7 0 00-1 1.6V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1-1.6 1.7 1.7 0 00-1.9.3l-.1.1a2 2 0 11-2.9-2.9l.1-.1a1.7 1.7 0 00.3-1.9 1.7 1.7 0 00-1.6-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.6-1 1.7 1.7 0 00-.3-1.9l-.1-.1a2 2 0 112.9-2.9l.1.1a1.7 1.7 0 001.9.3H9a1.7 1.7 0 001-1.6V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.6 1.7 1.7 0 001.9-.3l.1-.1a2 2 0 112.9 2.9l-.1.1a1.7 1.7 0 00-.3 1.9V9a1.7 1.7 0 001.6 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.6 1z"/></svg>Settings<svg class="expand" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></li>
+        </ul>
+        <div class="sidebar-profile">
+          <div class="profile-avatar" role="img" aria-label="Jordan Avery"></div>
+          <span class="profile-name">Jordan Avery</span>
+          <div class="profile-icons">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+            <span class="dot-badge"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 00-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 01-3.4 0"/></svg></span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="content">
+      <div class="filter-row">
+        <div class="segmented">
+          <button>Desktop</button>
+          <button class="active">Mobile</button>
+        </div>
+        <div class="dropdown">
+          Production
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 9l4 4 4-4"/></svg>
+        </div>
+        <div class="spacer"></div>
+        <div class="date-range">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+          Last 7 Days
+        </div>
+      </div>
+
+      <div class="panels">
+        <div class="metrics-list">
+          <div class="metric-card active">
+            <div class="metric-label">Real User Score</div>
+            <div class="metric-ring-row">
+              <svg width="42" height="42" viewBox="0 0 42 42">
+                <circle cx="21" cy="21" r="17" fill="none" stroke="#eef0f4" stroke-width="5"/>
+                <circle cx="21" cy="21" r="17" fill="none" stroke="var(--warn)" stroke-width="5" stroke-linecap="round" stroke-dasharray="106.8" stroke-dashoffset="30" transform="rotate(-90 21 21)"/>
+                <text x="21" y="25" text-anchor="middle" font-size="12" font-weight="700" fill="var(--ink-900)">68</text>
+              </svg>
+            </div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-label">First Contentful Paint</div>
+            <div class="metric-value-row"><span class="metric-value tone-bad">3.86</span><span class="metric-unit">s</span></div>
+            <div class="metric-bar"><i class="tone-bad" style="width:78%"></i></div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-label">Largest Contentful Paint</div>
+            <div class="metric-value-row"><span class="metric-value tone-bad">3.86</span><span class="metric-unit">s</span></div>
+            <div class="metric-bar"><i class="tone-bad" style="width:78%"></i></div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-label">Interaction to Next Paint</div>
+            <div class="metric-value-row"><span class="metric-value tone-good">36</span><span class="metric-unit">ms</span></div>
+            <div class="metric-bar"><i class="tone-good" style="width:14%"></i></div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-label">Cumulative Layout Shift</div>
+            <div class="metric-value-row"><span class="metric-value tone-good">0</span></div>
+            <div class="metric-bar"><i class="tone-good" style="width:4%"></i></div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-label">First Input Delay</div>
+            <div class="metric-value-row"><span class="metric-value tone-good">18</span><span class="metric-unit">ms</span></div>
+            <div class="metric-bar"><i class="tone-good" style="width:10%"></i></div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-label">Time to First Byte</div>
+            <div class="metric-value-row"><span class="metric-value tone-bad">2.08</span><span class="metric-unit">s</span></div>
+            <div class="metric-bar"><i class="tone-bad" style="width:66%"></i></div>
+          </div>
+        </div>
+
+        <div class="detail-panel">
+          <div class="detail-top">
+            <div class="detail-left">
+              <div class="device-tag">Mobile</div>
+              <h2 class="detail-heading">Real User Score</h2>
+              <div class="score-row">
+                <svg width="66" height="66" viewBox="0 0 66 66">
+                  <circle cx="33" cy="33" r="27" fill="none" stroke="#eef0f4" stroke-width="7"/>
+                  <circle cx="33" cy="33" r="27" fill="none" stroke="var(--warn)" stroke-width="7" stroke-linecap="round" stroke-dasharray="169.6" stroke-dashoffset="48" transform="rotate(-90 33 33)"/>
+                  <text x="33" y="39" text-anchor="middle" font-size="18" font-weight="700" fill="var(--ink-900)">68</text>
+                </svg>
+                <div>
+                  <div class="score-status">Needs Improvement</div>
+                  <div class="score-flag">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+                    Below target
+                  </div>
+                </div>
+              </div>
+              <p class="detail-copy hint">Fewer than 75% of sessions met the target experience this week.</p>
+              <p class="detail-copy">Real User Score blends field data across loading, responsiveness, and stability. Aim for a score above 90 to keep visits fast for everyone.</p>
+              <a class="learn-link" href="#">Learn more about RUS
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M8 7h9v9"/></svg>
+              </a>
+            </div>
+            <div class="legend-row">
+              <span class="legend-item active"><span class="legend-dot"></span>P75</span>
+              <span class="legend-item"><span class="legend-dot"></span>P90</span>
+              <span class="legend-item"><span class="legend-dot"></span>P95</span>
+              <span class="legend-item"><span class="legend-dot"></span>P99</span>
+            </div>
+          </div>
+
+          <div class="chart-wrap">
+            <svg class="chart-svg" viewBox="0 0 900 300" preserveAspectRatio="none">
+              <line x1="40" y1="10" x2="40" y2="250" stroke="#e2e4ea" stroke-width="1"/>
+              <line x1="40" y1="250" x2="880" y2="250" stroke="#e2e4ea" stroke-width="1"/>
+              <text x="30" y="14" text-anchor="end" font-size="12" fill="#8b91a2">100</text>
+              <text x="30" y="130" text-anchor="end" font-size="12" fill="#0a9a6b">90</text>
+              <text x="30" y="210" text-anchor="end" font-size="12" fill="#c8790a">50</text>
+              <text x="30" y="254" text-anchor="end" font-size="12" fill="#8b91a2">0</text>
+              <line x1="40" y1="130" x2="880" y2="130" stroke="#0a9a6b" stroke-width="1.5" stroke-dasharray="4 4"/>
+              <line x1="40" y1="210" x2="880" y2="210" stroke="#c8790a" stroke-width="1.5" stroke-dasharray="4 4"/>
+              <circle cx="126" cy="130" r="3" fill="#0a9a6b"/>
+              <circle cx="40" cy="210" r="3" fill="#c8790a"/>
+              <path d="M640 245 v-6 M642 245 v-10 M718 245 v-6 M720 245 v-10" stroke="#c2c6d1" stroke-width="2" stroke-linecap="round"/>
+              <circle cx="762" cy="168" r="4.5" fill="var(--brand)"/>
+              <text x="80" y="272" font-size="12" fill="#8b91a2">Apr 17</text>
+              <text x="200" y="272" font-size="12" fill="#8b91a2">Apr 18</text>
+              <text x="320" y="272" font-size="12" fill="#8b91a2">Apr 19</text>
+              <text x="440" y="272" font-size="12" fill="#8b91a2">Apr 20</text>
+              <text x="560" y="272" font-size="12" fill="#8b91a2">Apr 21</text>
+              <text x="680" y="272" font-size="12" fill="#8b91a2">Apr 22</text>
+              <text x="800" y="272" font-size="12" fill="#8b91a2">Apr 23</text>
+            </svg>
+          </div>
+
+          <div class="tabs-row">
+            <div class="tab active">Routes</div>
+            <div class="tab">Pages</div>
+            <div class="tabs-spacer"></div>
+            <div class="tabs-suffix">RUS</div>
+          </div>
+
+          <div class="route-grid">
+            <div class="route-col">
+              <div class="route-col-head">
+                <span class="tag bad">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+                  Poor
+                </span>
+                <span class="range">&lt;50</span>
+              </div>
+              <div class="route-empty">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4"/></svg>
+                No poor scores
+              </div>
+            </div>
+            <div class="route-col">
+              <div class="route-col-head">
+                <span class="tag warn">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.3 3.9L1.8 18a2 2 0 001.7 3h17a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+                  Needs Improvement
+                </span>
+                <span class="range">50–90</span>
+              </div>
+              <div class="route-entry">
+                <span class="route-path">/</span>
+                <span class="route-visits">6 sessions</span>
+                <span class="route-score">68</span>
+              </div>
+            </div>
+            <div class="route-col">
+              <div class="route-col-head">
+                <span class="tag good">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4"/></svg>
+                  Excellent
+                </span>
+                <span class="range">&gt;90</span>
+              </div>
+              <div class="route-empty">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9l-6 6"/></svg>
+                No excellent scores
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+</body>
+</html>

@@ -4,15 +4,17 @@ Mariner AI：把美国关税政策变化换算成每笔订单利润变化的本�
 
 ## 文档
 
-- v0.2.1 修复与任务：`docs/V021_SPEC.md`、`docs/TASKS_V021.md`（当前开发阶段先读）
+- v0.3 改版与任务：`docs/V03_DESIGN.md`、`docs/TASKS_V03.md`、`design/tokens-v03.css`、`design/mock/`（当前开发阶段先读）
+- v0.2.1 修复与任务：`docs/V021_SPEC.md`、`docs/TASKS_V021.md`
 - v0.2 改动与任务：`docs/V02_SPEC.md`、`docs/TASKS_V02.md`、`docs/engine_text_templates.json`
 - v0.1 任务与验收：`docs/TASKS.md`
 - 架构、目录、依赖、环境变量、数据流、业务规则：`docs/SPEC.md`
-- 视觉、布局、组件、文案、Logo：`docs/DESIGN.md`、`design/tokens.css`、`design/reference/approva-reference.html`、`design/logo/`
+- 格式与文案：`docs/DESIGN.md` §7、§8，以及 §11 的「审计动作中文」「合同关税条款显示」（其余视觉规则已由 V03_DESIGN 取代）；Logo：`design/logo/`
+- 视觉参照：`design/reference/vitals-reference.html`（只作参照）
 - 接口与数据结构：`docs/API.md`
 - 智能体、模型调用、校验：`docs/AI_PIPELINE.md`
 
-文档冲突时按此优先级取值：V021_SPEC > V02_SPEC > SPEC > API > AI_PIPELINE > DESIGN > TASKS_V021 > TASKS_V02 > TASKS，并在回复中注明冲突位置。
+文档冲突时按此优先级取值：V03_DESIGN > V021_SPEC > V02_SPEC > SPEC > API > AI_PIPELINE > DESIGN > TASKS_V03 > TASKS_V021 > TASKS_V02 > TASKS，并在回复中注明冲突位置。
 
 ## 不确定的事不自主决策
 
@@ -35,10 +37,10 @@ Mariner AI：把美国关税政策变化换算成每笔订单利润变化的本�
 
 ## 约束
 
-- 关税、费用、利润的数字只由 `backend/app/engine/` 计算。大模型不生成、也不修改任何数字：对话中只能照抄知识库里已有的数字（经数字守卫检查）；导入时从文件中抄录的数字，必须经人工预览确认后才能入库。
+- 关税、费用、利润的数字只由 `backend/app/engine/` 计算。大模型不生成、也不修改任何数字：对话中只能照抄知识库里已有的数字（经数字守卫检查）；导入时从文件中抄录的数字，必须经人工预览确认后才能入库。前端只做格式化和 V03_DESIGN §9.4 列出的计数与图形换算，不计算业务数字。
 - 订单数据（客户、价格、成本、数量）不发给大模型或任何外部服务，只有 `docs/V02_SPEC.md` §9 列出的两种经用户同意的情况例外，且都要写审计。
 - 不改引擎的计算逻辑，也不改 `rules.json` 中的税率和日期。`seed/golden/impacts.json` 测试必须一直通过。
-- 依赖只用 `docs/SPEC.md` §4 白名单中的，以及 `docs/V02_SPEC.md` §9 新增的 `prettier`、`openpyxl`。
+- 依赖只用 `docs/SPEC.md` §4 白名单中的，以及 `docs/V02_SPEC.md` §9 新增的 `prettier`、`openpyxl`。v0.3 按 V03_DESIGN §10 移除 `gsap`、`@gsap/react`、`animejs` 和 `next/font/google` 字体。
 - 自动化测试不联网，统一使用 `backend/fixtures/`。
 - 前后端都只监听 `127.0.0.1`。
 
@@ -47,7 +49,7 @@ Mariner AI：把美国关税政策变化换算成每笔订单利润变化的本�
 **无需询问：**
 
 - 在仓库内创建、修改文件
-- 安装白名单内的依赖
+- 安装白名单内的依赖；移除 V03_DESIGN §10 列出的依赖
 - 运行测试、lint、开发服务器
 - 用 Playwright 截图
 - 创建或删除测试库和 `backend/data/e2e.db`
@@ -76,9 +78,9 @@ npx playwright test
 
 ## 完成定义
 
-- 满足当前阶段任务文件（v0.2.1 为 `docs/TASKS_V021.md`）中该任务的全部验收标准。
+- 满足当前阶段任务文件（v0.3 为 `docs/TASKS_V03.md`）中该任务的全部验收标准。
 - 按改动所在一侧运行检查：后端 `ruff check` + `pytest`；前端 `lint` + `typecheck`；涉及 E2E 的任务再跑 `playwright`。检查通过后，没有新改动就不重复测试，也不扩大测试范围。
 - 界面任务：在 1440×900 下截图，存为 `artifacts/screenshots/<任务ID>.png`；同一任务需要多张时，命名为 `<任务ID>-<宽度或状态>.png`。回复中附上路径。
 - 在当前阶段任务文件中把该任务状态改为 `DONE（日期）`，并写一行说明。
 - 按 TASKS 的顺序推进。任务被部分阻塞时，先做完其余部分，再继续下一个任务。
-- 回复用中文。代码、注释、提交信息用英文。中文界面文案只用 `docs/DESIGN.md`、`docs/API.md`、`docs/V02_SPEC.md`、`docs/V021_SPEC.md` 中写出的字符串；英文文案优先按 `docs/V021_SPEC.md` §7，其余按 `docs/V02_SPEC.md` §7.6 的术语表翻译，并汇总到 `docs/i18n-review.md`。
+- 回复用中文。代码、注释、提交信息用英文。中文界面文案只用 `docs/V03_DESIGN.md`、`docs/DESIGN.md`、`docs/API.md`、`docs/V02_SPEC.md`、`docs/V021_SPEC.md` 中写出的字符串；英文文案优先按 `docs/V03_DESIGN.md` §11 和 `docs/V021_SPEC.md` §7，其余按 `docs/V02_SPEC.md` §7.6 的术语表翻译，并汇总到 `docs/i18n-review.md`。

@@ -1,3 +1,5 @@
+v0.3 起视觉以 docs/V03_DESIGN.md 为准；本文件只有 §7、§8 和 §11 的审计动作、合同关税条款显示仍然有效。
+
 # DESIGN.md
 
 视觉参考的源码快照：`design/reference/approva-reference.html`。样式：`design/tokens.css`，复制到 `frontend/src/app/globals.css`。

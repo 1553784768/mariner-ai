@@ -47,19 +47,16 @@ export function ImportPreview({ id }: { id: string }) {
   const fields = all ? Array.from(new Set(rows.flatMap((row) => Object.keys(row)))) : columns;
   const busy = operation.isPending;
   return (
-    <section className="import-preview brut-sm" data-testid="import-preview">
+    <section className="import-preview" data-testid="import-preview">
       <strong>{value.filename}</strong>
       {operation.error && <ErrorBanner error={operation.error} />}
       {value.status === "needs_consent" && (
-        <div className="modal-backdrop">
-          <section
-            className="import-modal brut-lg"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby={`consent-${id}`}
-          >
-            <h2 id={`consent-${id}`}>{t("发送文件给模型？")}</h2>
-            <p>
+        <div className="overlay">
+          <section className="modal" role="dialog" aria-modal="true" aria-labelledby={`consent-${id}`}>
+            <h2 className="modal-head" id={`consent-${id}`}>
+              {t("发送文件给模型？")}
+            </h2>
+            <p className="modal-body">
               {t(
                 "「{filename}」的内容将发送给已配置的模型 {model}{endpoint}用于识别订单。文件可能包含客户、价格和成本信息。",
                 {
@@ -73,13 +70,13 @@ export function ImportPreview({ id }: { id: string }) {
                 },
               )}
             </p>
-            <div className="button-row">
+            <div className="modal-foot">
+              <button className="btn" disabled={busy} onClick={() => operation.mutate({ action: "cancel" })}>
+                {t("取消")}
+              </button>
               <PrimaryButton disabled={busy} onClick={() => operation.mutate({ action: "consent" })}>
                 {t("发送并识别")}
               </PrimaryButton>
-              <button disabled={busy} onClick={() => operation.mutate({ action: "cancel" })}>
-                {t("取消")}
-              </button>
             </div>
           </section>
         </div>
@@ -89,11 +86,11 @@ export function ImportPreview({ id }: { id: string }) {
       )}
       {value.status === "parsed" && (
         <>
-          <button className="secondary-button brut-sm" onClick={() => setAll(!all)} aria-pressed={all}>
+          <button className="btn" onClick={() => setAll(!all)} aria-pressed={all}>
             {t("显示全部字段")}
           </button>
-          <div className="preview-scroll">
-            <table className="data-table">
+          <div style={{ overflowX: "auto" }}>
+            <table className="table">
               <thead>
                 <tr>
                   {fields.map((field) => (
@@ -109,8 +106,10 @@ export function ImportPreview({ id }: { id: string }) {
                         (e) => e.row === index + (value.kind === "csv" ? 2 : 1) && e.field === field,
                       );
                       return (
-                        <td key={field}>
+                        <td key={field} style={error ? { background: "var(--color-bad-soft)" } : undefined}>
                           <input
+                            className="input"
+                            style={{ height: 30, padding: "4px 8px" }}
                             disabled={busy}
                             aria-label={`${index + 1}-${field}`}
                             title={error?.message}
@@ -134,27 +133,27 @@ export function ImportPreview({ id }: { id: string }) {
             </table>
           </div>
           {value.errors.map((error, index) => (
-            <p className="text-bad" key={index}>
+            <p className="tone-bad" style={{ fontSize: 12 }} key={index}>
               {error.row} · {error.field} · {error.message}
             </p>
           ))}
           <p>{value[`notes_${lang}`]}</p>
-          <div className="button-row">
+          <div style={{ display: "flex", gap: 8 }}>
             <PrimaryButton
-              className="tone-ok"
+              className="btn-good"
               disabled={busy || !!draft || !!value.errors.length || !rows.length}
               onClick={() => operation.mutate({ action: "commit" })}
             >
               {t("确认导入")}
             </PrimaryButton>
-            <button disabled={busy} onClick={() => operation.mutate({ action: "cancel" })}>
+            <button className="btn" disabled={busy} onClick={() => operation.mutate({ action: "cancel" })}>
               {t("取消")}
             </button>
           </div>
         </>
       )}
       {value.status === "imported" && (
-        <Tag tone="ok">
+        <Tag tone="good">
           {result ? (
             <>
               {t("已导入")}

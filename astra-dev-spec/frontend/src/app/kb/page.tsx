@@ -1,6 +1,7 @@
 "use client";
+import { IconSearch, IconPencil, IconRestore, IconTrash } from "@tabler/icons-react";
 import { t } from "@/i18n/runtime";
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
@@ -8,7 +9,7 @@ import { formatTime } from "@/lib/format";
 import type { KnowledgeEntry } from "@/lib/v02";
 import { useI18n } from "@/i18n";
 import { Shell } from "@/components/shell";
-import { EmptyPanel, ErrorBanner, LoadingPanel, PrimaryButton, Tag } from "@/components/ui";
+import { EmptyPanel, ErrorBanner, LoadingPanel, PrimaryButton, Tag, Switch } from "@/components/ui";
 
 function Knowledge() {
   const { lang } = useI18n();
@@ -64,7 +65,12 @@ function Knowledge() {
       setCreating(false);
       setSystem(false);
       if (action === "create") router.replace(`/knowledge?id=${encodeURIComponent(result.id)}`);
-      if (action === "delete") router.replace("/knowledge");
+      if (action === "delete") {
+        cache.setQueryData<KnowledgeEntry[]>(["kb", type, query, sensitive, lang], (current) =>
+          (current || []).filter((entry) => entry.id !== id),
+        );
+        router.replace("/knowledge");
+      }
       cache.invalidateQueries();
     },
   });
@@ -78,17 +84,24 @@ function Knowledge() {
       impact: t("影响单"),
       manual: t("手动"),
     })[key] || key;
+  useEffect(() => {
+    if (!params.get("id") && !creating && entries.data?.length) {
+      router.replace(`/knowledge?id=${encodeURIComponent(entries.data[0].id)}`, { scroll: false });
+    }
+  }, [params, creating, entries.data, router]);
+  const resetFilter = (next: string) => {
+    setType(next);
+    setCreating(false);
+    setEditing(false);
+    router.replace("/knowledge", { scroll: false });
+  };
+  const error = entries.error || mutation.error || (!creating ? detail.error : null);
   return (
     <Shell title={t("知识库")}>
-      <div className="knowledge-layout grid-doc">
-        <section className="knowledge-list">
-          <input
-            className="brut-sm knowledge-search"
-            placeholder={t("搜索知识库…")}
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-          />
-          <div className="knowledge-filters">
+      <div className="filter-row">
+        <label className="dropdown">
+          <span className="dropdown-label">{t("类型")}</span>
+          <select aria-label={t("类型")} value={type} onChange={(e) => resetFilter(e.target.value)}>
             {[
               ["", t("全部")],
               ["policy", t("政策")],
@@ -100,179 +113,243 @@ function Knowledge() {
               ["manual", t("手动")],
               ["deleted", t("已删除")],
             ].map(([key, label]) => (
-              <button
-                className={`filter-button ${type === key ? "active" : ""}`}
-                key={key}
-                onClick={() => setType(key)}
-              >
+              <option key={key} value={key}>
                 {label}
-              </button>
+              </option>
             ))}
+          </select>
+        </label>
+        <Switch checked={sensitive} onChange={setSensitive}>
+          {t("显示订单数据")}
+        </Switch>
+        <span className="spacer" />
+        <PrimaryButton
+          onClick={() => {
+            setCreating(true);
+            setEditing(true);
+            setTitle("");
+            setBody("");
+          }}
+        >
+          {t("+ 新建条目")}
+        </PrimaryButton>
+      </div>
+      {error && (
+        <ErrorBanner
+          error={error}
+          retry={() => {
+            void entries.refetch();
+            void detail.refetch();
+            if (mutation.error && mutation.variables) mutation.mutate(mutation.variables);
+          }}
+        />
+      )}
+      <div className="panels fill">
+        <aside className="metrics-list">
+          <div className="list-head">
+            <div className="search-box" style={{ marginBottom: 0 }}>
+              <IconSearch size={14} />
+              <input
+                placeholder={t("搜索知识库…")}
+                value={query}
+                onChange={(e) => {
+                  setQuery(e.target.value);
+                  router.replace("/knowledge", { scroll: false });
+                }}
+              />
+            </div>
           </div>
-          <label>
-            <input type="checkbox" checked={sensitive} onChange={(e) => setSensitive(e.target.checked)} />
-            {t("显示订单数据")}
-          </label>
-          <PrimaryButton
-            onClick={() => {
-              setCreating(true);
-              setEditing(true);
-              setTitle("");
-              setBody("");
-            }}
-          >
-            {t("+ 新建条目")}
-          </PrimaryButton>
-          {entries.error && <ErrorBanner error={entries.error} />}
           {entries.isPending && <LoadingPanel />}
           {entries.data?.length === 0 && <EmptyPanel>{t("暂无条目")}</EmptyPanel>}
           {entries.data?.map((entry) => (
             <button
               key={entry.id}
-              className="knowledge-card brut-sm"
+              className={`metric-card compact${entry.id === id ? " active" : ""}`}
+              style={{ textAlign: "left" }}
+              data-knowledge={entry.id}
               data-selected={entry.id === id}
               onClick={() => {
                 setCreating(false);
-                router.replace(`/knowledge?id=${encodeURIComponent(entry.id)}`);
+                router.replace(`/knowledge?id=${encodeURIComponent(entry.id)}`, { scroll: false });
               }}
             >
-              <strong>{entry.title}</strong>
-              <div className="tags">
+              <div className="metric-label clamp" style={{ marginBottom: 8 }}>
+                {entry.title}
+              </div>
+              <div className="chips">
                 <Tag>{typeLabel(entry.source_type)}</Tag>
-                {entry.edited && <Tag>{t("已编辑")}</Tag>}
+                {entry.edited && <Tag tone="brand">{t("已编辑")}</Tag>}
                 {entry.source_changed && <Tag tone="warn">{t("来源已更新")}</Tag>}
                 {!entry.editable && <Tag>{t("只读")}</Tag>}
               </div>
             </button>
           ))}
-        </section>
-        <section className="knowledge-detail">
-          {mutation.error && <ErrorBanner error={mutation.error} />}
-          {detail.error && !creating && <ErrorBanner error={detail.error} />}
-          {(creating || value) && (
-            <article className="paper-document brut-lg">
-              {value?.deleted && !creating && (
-                <div className="source-banner tone-warn-soft brut-sm" data-testid="deleted-banner">
-                  {t("已删除")}
-                  <button disabled={mutation.isPending} onClick={() => mutation.mutate("undelete")}>
-                    {t("恢复")}
-                  </button>
-                </div>
-              )}
-              {value?.source_changed && !creating && (
-                <div className="source-banner tone-warn-soft brut-sm">
-                  {t("来源已更新，当前显示的是你编辑过的版本")}
-                  <button onClick={() => setSystem(!system)}>{t("查看系统版本")}</button>
-                  <button disabled={mutation.isPending} onClick={() => mutation.mutate("restore")}>
-                    {t("恢复")}
-                  </button>
-                </div>
-              )}
-              {editing ? (
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    mutation.mutate(creating ? "create" : "edit");
+        </aside>
+        <article className="detail-panel" data-testid="knowledge-detail">
+          {detail.isPending && id && !creating && <LoadingPanel />}
+          {!creating && !value && !entries.isPending && (!id || !detail.isPending) && (
+            <EmptyPanel>{t("暂无条目")}</EmptyPanel>
+          )}
+          {value?.deleted && !creating && (
+            <div className="detail-body" style={{ paddingTop: 22, paddingBottom: 0 }}>
+              <div className="banner warn" data-testid="deleted-banner">
+                <IconTrash />
+                {t("已删除")}
+                <span className="spacer" />
+                <button
+                  className="btn"
+                  disabled={mutation.isPending}
+                  onClick={() => mutation.mutate("undelete")}
+                >
+                  <IconRestore />
+                  {t("恢复")}
+                </button>
+              </div>
+            </div>
+          )}
+          {value?.source_changed && !value.deleted && !creating && (
+            <div className="detail-body" style={{ paddingTop: 22, paddingBottom: 0 }}>
+              <div className="banner warn">
+                {t("来源已更新，当前显示的是你编辑过的版本")}
+                <span className="spacer" />
+                <button className="btn" onClick={() => setSystem(!system)}>
+                  {t("查看系统版本")}
+                </button>
+                <button
+                  className="btn"
+                  disabled={mutation.isPending}
+                  onClick={() => mutation.mutate("restore")}
+                >
+                  {t("恢复")}
+                </button>
+              </div>
+            </div>
+          )}
+          {system && value && !value.deleted && !creating && (
+            <section className="inline-panel" data-testid="system-version">
+              <h3>{value[`auto_title_${lang}`]}</h3>
+              <p className="body-text">{value[`auto_body_${lang}`]}</p>
+            </section>
+          )}
+          {editing ? (
+            <form
+              className="detail-body"
+              style={{ paddingTop: 22 }}
+              onSubmit={(e) => {
+                e.preventDefault();
+                mutation.mutate(creating ? "create" : "edit");
+              }}
+            >
+              <div className="field">
+                <label htmlFor="knowledge-title">{t("标题")}</label>
+                <input
+                  id="knowledge-title"
+                  className="input"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="field">
+                <label htmlFor="knowledge-body">{t("正文")}</label>
+                <textarea
+                  id="knowledge-body"
+                  className="textarea"
+                  value={body}
+                  onChange={(e) => setBody(e.target.value)}
+                  required
+                  rows={12}
+                />
+              </div>
+              <div style={{ display: "flex", gap: 8 }}>
+                <PrimaryButton disabled={mutation.isPending || !title.trim() || !body.trim()}>
+                  {t("保存")}
+                </PrimaryButton>
+                <button
+                  type="button"
+                  className="btn"
+                  onClick={() => {
+                    setEditing(false);
+                    setCreating(false);
                   }}
                 >
-                  <label htmlFor="knowledge-title">
-                    {t("标题")}
-                    <input
-                      id="knowledge-title"
-                      aria-label={t("标题")}
-                      className="brut-sm"
-                      value={title}
-                      onChange={(e) => setTitle(e.target.value)}
-                      required
-                    />
-                  </label>
-                  <label htmlFor="knowledge-body">
-                    {t("正文")}
-                    <textarea
-                      id="knowledge-body"
-                      aria-label={t("正文")}
-                      className="brut-sm"
-                      value={body}
-                      onChange={(e) => setBody(e.target.value)}
-                      required
-                      rows={12}
-                    />
-                  </label>
-                  <div className="button-row">
-                    <PrimaryButton disabled={mutation.isPending || !title.trim() || !body.trim()}>
-                      {t("保存")}
-                    </PrimaryButton>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setEditing(false);
-                        setCreating(false);
-                      }}
-                    >
-                      {t("取消")}
-                    </button>
+                  {t("取消")}
+                </button>
+              </div>
+            </form>
+          ) : (
+            value && (
+              <>
+                <div className="detail-top">
+                  <div className="detail-left wide">
+                    <div className="device-tag">
+                      {t("{type} · 更新于 {date}", {
+                        type: typeLabel(value.source_type),
+                        date: formatTime(value.updated_at).slice(5),
+                      })}
+                    </div>
+                    <h2 className="detail-heading">{value[`title_${lang}`] || value.title_zh}</h2>
                   </div>
-                </form>
-              ) : (
-                value && (
-                  <>
-                    <div className="section-heading">
-                      <h2>{value[`title_${lang}`] || value.title_zh}</h2>
-                      <button
-                        disabled={mutation.isPending}
-                        className="secondary-button brut-sm text-bad"
-                        onClick={() => {
-                          const question =
-                            value.source_type === "manual"
-                              ? "确定删除这条知识吗？"
-                              : "删除后，这条内容不再出现在知识库列表和对话中，可在「已删除」中恢复。不影响订单、规则和关税计算。确定删除吗？";
-                          if (confirm(t(question))) mutation.mutate("delete");
-                        }}
-                      >
-                        {t("删除")}
-                      </button>
-                    </div>
-                    <div className="tags">
-                      <Tag>{typeLabel(value.source_type)}</Tag>
-                      <time className="label-mono">{formatTime(value.updated_at)}</time>
-                    </div>
-                    <p className="knowledge-body">{value[`body_${lang}`] || value.body_zh}</p>
-                    {system && (
-                      <section className="system-version brut-sm">
-                        <h3>{value[`auto_title_${lang}`]}</h3>
-                        <p className="knowledge-body">{value[`auto_body_${lang}`]}</p>
-                      </section>
-                    )}
-                    {value.editable ? (
-                      <div className="button-row">
-                        <PrimaryButton
-                          onClick={() => {
-                            setTitle(value[`title_${lang}`] || "");
-                            setBody(value[`body_${lang}`] || "");
-                            setEditing(true);
-                          }}
-                        >
-                          {t("编辑")}
-                        </PrimaryButton>
+                  {!value.deleted && (
+                    <aside className="detail-actions">
+                      <div className="row">
+                        {value.editable ? (
+                          <button
+                            className="btn"
+                            onClick={() => {
+                              setTitle(value[`title_${lang}`] || "");
+                              setBody(value[`body_${lang}`] || "");
+                              setEditing(true);
+                            }}
+                          >
+                            <IconPencil />
+                            {t("编辑")}
+                          </button>
+                        ) : (
+                          <Tag>{t("系统生成，只读")}</Tag>
+                        )}
                         {value.source_type !== "manual" && value[`edited_${lang}`] && (
-                          <button disabled={mutation.isPending} onClick={() => mutation.mutate("restore")}>
+                          <button
+                            className="btn"
+                            disabled={mutation.isPending}
+                            onClick={() => mutation.mutate("restore")}
+                          >
+                            <IconRestore />
                             {t("恢复系统版本")}
                           </button>
                         )}
+                        <button
+                          className="btn btn-danger-text"
+                          disabled={mutation.isPending}
+                          onClick={() => {
+                            const question =
+                              value.source_type === "manual"
+                                ? "确定删除这条知识吗？"
+                                : "删除后，这条内容不再出现在知识库列表和对话中，可在「已删除」中恢复。不影响订单、规则和关税计算。确定删除吗？";
+                            if (confirm(t(question))) mutation.mutate("delete");
+                          }}
+                        >
+                          <IconTrash />
+                          {t("删除")}
+                        </button>
                       </div>
-                    ) : (
-                      <Tag>{t("系统生成，只读")}</Tag>
-                    )}
-                  </>
-                )
-              )}
-            </article>
+                    </aside>
+                  )}
+                </div>
+                <div className="detail-body">
+                  <p className="body-text" data-testid="knowledge-body">
+                    {value[`body_${lang}`] || value.body_zh}
+                  </p>
+                </div>
+              </>
+            )
           )}
-        </section>
+        </article>
       </div>
     </Shell>
   );
 }
+
 export default function Page() {
   return (
     <Suspense fallback={<LoadingPanel />}>
