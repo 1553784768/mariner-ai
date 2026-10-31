@@ -14,6 +14,7 @@ def audit_hash(event):
 
 
 def append(session, today, action, actor, entity, summary):
+    from app.localization import audit_en
     # Allocate under SQLite's write lock before reading the preceding event.
     record = AuditEvent(payload={})
     session.add(record)
@@ -21,6 +22,7 @@ def append(session, today, action, actor, entity, summary):
     last = session.scalar(select(AuditEvent).where(AuditEvent.seq < record.seq).order_by(AuditEvent.seq.desc()).limit(1))
     event = dict(seq=record.seq, at=now(), business_date=today,
                  actor=actor, action=action, entity=entity, summary=summary,
+                 summary_zh=summary, summary_en=audit_en(summary),
                  prev_hash=last.payload["hash"] if last else "0" * 64)
     event["hash"] = audit_hash(event)
     record.payload = event

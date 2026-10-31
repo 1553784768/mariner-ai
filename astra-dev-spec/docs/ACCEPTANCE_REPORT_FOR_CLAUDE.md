@@ -1,109 +1,122 @@
-# Mariner AI：交给 Claude 的验收与交接报告
+# Mariner AI v0.2.0：交给 Claude 的验收报告
 
-日期：2026-10-31（Asia/Shanghai）
-项目目录：`C:\Users\15537\Documents\ChatGPT\三城黑客松\astra-dev-spec`
+日期：2026-10-31（Asia/Shanghai）。这是实现方的开发验收与交接材料，尚非独立验收结论。
 
-## 1. 结论与范围
+## 结论
 
-已按 AGENTS.md 和 docs/TASKS.md 推进至 M8：27 个任务中，25 个标记 DONE，2 个标记 PARTIAL / BLOCKED(Q-001)。不能据此声称 M0–M8 全部无条件完成。
+已按用户确认实现整套 v0.2：P1–P14 反馈处理、知识库、AI 工作台、多模态订单导入、中英文切换。任务表共 22 项，21 项 DONE，T-9.6 因未在 Linux 执行 Playwright 保持 PARTIAL。P2 的真实联调仍待验收，P11 依规格暂缓。不能称作全部验收无条件通过。
 
-实现包括 FastAPI / SQLite 后端、确定性订单计算、导入与批次、决策和哈希审计、政策采集、模型配置、分诊/抽取/校验/日报流水线，以及 Next.js 收件箱、规则审核、日报、流水线和模型接入页面。前端依据指定 Approva 参考与项目 DESIGN/tokens 实现。
+项目：`C:/Users/15537/Documents/ChatGPT/三城黑客松/astra-dev-spec`。
+Git 根目录是其父目录 `三城黑客松`，从仓库取源码时进入 `astra-dev-spec` 再运行命令。
 
-本报告区分三类证据：上一轮开发验收结果、本次启动核验、尚未实测的范围。自动测试通过不等于对所有安全性质和所有输入完成穷尽证明。
+版本：`v0.2.0`。
+仓库：https://github.com/1553784768/mariner-ai
+发布入口：https://github.com/1553784768/mariner-ai/releases/tag/v0.2.0
 
-## 2. 逐里程碑结果
+## 已确定的启动状态
 
-| 里程碑 | 任务状态 | 截图（相对于项目根目录） | 新增问题 |
-|---|---|---|---|
-| M0 | T-0.1 DONE：目录、忽略规则、环境变量示例 | 无界面任务 | 无 |
-| M1 | T-1.1–1.3 DONE：服务骨架、引擎移植、数据库和种子 | 无界面任务 | 无 |
-| M2 | T-2.1–2.3 DONE：导入、影响查询、决策和审计 | 无界面任务 | 无 |
-| M3 | T-3.1 DONE；T-3.2 除 Q-001 两格外完成 | artifacts/screenshots/T-3.2.png | Q-001 |
-| M4 | T-4.1、4.2、4.4 DONE；T-4.3 除同两格外完成 | artifacts/screenshots/T-4.1.png、T-4.2.png、T-4.3-1440.png、T-4.3-1300.png、T-4.3-profits-1440.png、T-4.3-profits-1300.png、T-4.3-adopted.png、T-4.4.png | 无；引用 Q-001 |
-| M5 | T-5.1–5.3 DONE：FR/公开预览、USITC、调度及手动运行 | 无独立界面任务 | 无 |
-| M6 | T-6.1–6.5 DONE：模型配置、分诊、抽取校验、日报、编排 | 无独立界面任务 | 无 |
-| M7 | T-7.1–7.4 DONE：四个业务页面 | artifacts/screenshots/T-7.1.png、T-7.2.png、T-7.2-approved.png、T-7.3.png、T-7.4.png、T-7.4-success.png、T-7.4-failed.png | 无 |
-| M8 | T-8.1–8.2 DONE：E2E、启动脚本、安装/启动/测试文档 | artifacts/screenshots/T-8.2.png；完整流程复用 M4/M7 截图 | 无 |
+2026-10-31 18:56（北京时间）实测：后端 `/api/health` 返回 `ok`，OpenAPI 版本 `0.2.0`；收件箱、首页工作台和知识库均 HTTP 200，三页字体错误数为 0，浏览器 `pageerror` 为 0。
 
-## 3. 上一轮开发验收证据
+- 前端：http://127.0.0.1:3000/
+- 收件箱：http://127.0.0.1:3000/inbox
+- 后端：http://127.0.0.1:8000/api/health
+- 前后端仅监听 `127.0.0.1`，端口分别为 3000/8000。
+- 启动方式：后台 `scripts/dev.ps1 -Fixture`；`DATABASE_URL=sqlite:///./data/claude-acceptance.db`，`AS_OF_DATE=2026-10-31`，`COLLECTOR_MODE=fixture`，`SCHEDULER_ENABLED=false`。
+- 沿用已有验收数据库，未清空 `app.db` 或现有验收记录。本轮重启后查询显示：待处理 7、红色 1、紧急 1、待审草稿 12、决策总计 5，`llm_configured=true`。这些是已有状态，不是干净种子期望值。
+- 模型“已配置”只代表设置存在；本次启动检查未发送模型请求，不据此断言真实模型联调通过。
+- 开发日志仍有动画库弃用/空目标警告；它们未触发本次页面异常，但不应被描述为控制台完全无警告。
 
-| 检查 | 结果 | 可复查位置 |
-|---|---|---|
-| 后端 Ruff | 通过 | backend/pyproject.toml 与 backend/app/、backend/tests/；终端执行结果 |
-| 后端 pytest | 19 passed | backend/tests/；上一轮终端执行结果，未保存独立 pytest 日志 |
-| 前端 ESLint | 通过 | frontend/package.json 中 lint；终端执行结果 |
-| TypeScript | 通过 | frontend/package.json 中 typecheck；终端执行结果 |
-| 生产构建 | 通过 | artifacts/production-build.log |
-| Playwright | 2 passed，27.2 秒 | artifacts/playwright.log、frontend/e2e/workflow.spec.ts |
-| Windows 干净副本安装/启动 | 新建 Python 3.12 venv、pip 安装、npm ci 后启动成功；浏览器显示 8 单 | artifacts/clean-python-install.log、clean-node-install.log、clean-startup.log、screenshots/T-8.2.png |
-| Linux 启动脚本 | bash -n 通过 | scripts/dev.sh；未在 Linux 实机运行 |
-| 固定资源一致性 | seed 下 4 个原始文件及 design/tokens.css 与用户 ZIP 逐字节一致；globals.css 与 tokens.css 一致 | seed/engine/engine.py、orders_sample.csv、rules.json、seed/golden/impacts.json、design/tokens.css |
+启动器 PID 见 `artifacts/acceptance-launch.pid`；日志见 `artifacts/acceptance-launch-v02*.log`、`artifacts/backend*.log`、`artifacts/frontend*.log`。
+可随 Git 复查的启动证据：`docs/acceptance/v0.2/startup.json` 和 `docs/acceptance/v0.2/screenshots/CLAUDE-v02-*.png`。
 
-后端用例覆盖原引擎/移植引擎/golden 的 8 单对照、导入原子校验、排序筛选、决策沿用、并发审计链、完整 fixture 流水线，以及使用 respx 模拟的 HTTP 重试与模型请求。完整业务 E2E 覆盖选中 O5、核对金额、Ctrl+Enter 决策、运行流水线、确认草稿、查看 9 条日报；另一项 E2E 拦截模型设置请求，验证保存/连接成功/连接失败/清除。
-
-关键对照值：O5 基准关税 $10,816.00、新关税 $26,816.00、增量 +$16,000.00；原利润 $8,473.57、重算利润 −$7,526.43。初始订单顺序 O5、O1、O3、O6、O4、O2、O8、O7。
-
-完整 fixture 流水线的输入/输出/跳过/错误依次为：
-
-| 步骤 | 输入 | 输出 | 跳过 | 错误 |
-|---|---:|---:|---:|---:|
-| 联邦公报 | 20 | 20 | 0 | 0 |
-| 公开预览 | 108 | 10 | 0 | 0 |
-| USITC | 1 | 1 | 0 | 0 |
-| 分诊 | 30 | 23 | 7 | 0 |
-| 抽取 | 8 | 2 | 6 | 0 |
-| 校验 | 2 | 2 | 0 | 0 |
-| 日报 | 1 | 1 | 0 | 0 |
-
-总体状态 partial 符合 AI_PIPELINE.md 的夹具期望，不代表运行异常。生成 2 张草稿、9 条日报。
-
-截图是不同操作阶段的快照：例如 T-7.1 在 O5 已采纳后生成，待处理红单数与未操作的初始状态不同，不能把跨阶段计数直接比较。
-
-## 4. 唯一开放问题 Q-001
-
-来源：docs/QUESTIONS.md。DESIGN 要求利润表显示卖方成本变化、毛利率变化；API 的 ImpactDetail 无对应字段，SPEC 又限制 evaluate 新增字段，AGENTS 禁止前端计算经济数字。
-
-- 当前行为：两格显示「待定」，frontend/src/components/ui.tsx 留有 BLOCKED(Q-001)。
-- 受影响任务：T-3.2、T-4.3；其他金额直接使用现有接口字段。
-- 待用户决定的 A 方案：允许引擎适配层计算并扩展 seller_cost_delta_usd、margin_delta_pp 两个 API 字段。
-- 待用户决定的 B 方案：批准两格统一显示「—」，不扩展接口。
-- Claude 不应把本报告视为对任一方案的批准，也不应自行补算或关闭 Q-001。
-
-## 5. 已知边界与实现说明
-
-- 关税规则是随项目提供的演示快照；测试没有独立核实真实世界关税事实。
-- 外部采集与模型 HTTP 分支使用离线模拟验收；未使用真实 API Key 做第三方模型或线上政策端到端联调。
-- 自动化测试使用临时数据库或可重建的 e2e.db。app.db 未被删除或清空。
-- 指定字体由 next/font/google 的成功生产构建下载，缓存原始 WOFF2 到 backend/fixtures/fonts/。fixture 启动与 E2E 通过 Next 测试 hook 加载内嵌原始字节的 CSS；普通构建保留正常 Google 字体加载。sha256.json 记录缓存哈希。该 hook 属于框架内部机制，升级 Next 时应复核。
-- 早期截图曾发现回退字体；修复后已重新运行 E2E 并覆盖截图，加入字体加载错误检查。1440/1300 的表格边界检查通过。
-- 所有直接依赖已锁版本；本机使用 Python 3.12.14 与 Next.js 16.4.3。
-- artifacts、数据库、依赖和构建目录已忽略。为版本交付复制的截图与已保存日志位于 docs/acceptance/，可随 Git 提交；正文中的 artifacts 路径是原始本机证据位置。版本号见根目录 VERSION，发布范围见 docs/RELEASE_NOTES.md。
-
-## 6. 本次启动与复现
-
-访问入口：http://127.0.0.1:3000/inbox
-后端健康接口：http://127.0.0.1:8000/api/health
-
-本次通过 scripts/dev.ps1 -Fixture 后台启动，显式使用 DATABASE_URL=sqlite:///./data/claude-acceptance.db。固定 AS_OF_DATE=2026-10-31、COLLECTOR_MODE=fixture、SCHEDULER_ENABLED=false；验收库未配置模型。启动器 PID 记录在 artifacts/acceptance-launch.pid，日志为 artifacts/acceptance-launch*.log 和 artifacts/frontend*.log、backend*.log。
-
-2026-10-31 16:19（北京时间）实际核验：health 返回 ok、/inbox 返回 HTTP 200；初始计数 pending=8、red=1、orange=1、yellow=2、green=4、urgent=2、drafts_pending=0、decisions_total=0，llm_configured=false。两个监听地址均为 127.0.0.1。证据：artifacts/acceptance-startup-check.json。
-
-浏览器进一步确认：收件箱渲染 8 张订单卡，O5 详情表已加载，document.fonts 中错误项为 0；本次截图为 artifacts/screenshots/CLAUDE-acceptance-startup.png。
-
-本次新增启动修复：后台 PowerShell 从 Node 标准输出读取含中文的字体夹具路径时，前端出现模块路径错误并返回 500。清理可重建缓存未解决；修改 scripts/dev.ps1，改为 Join-Path 直接构造环境变量路径，并检查夹具准备命令退出码后，后台启动成功。此改动仅涉及启动脚本，已通过实际后台启动和页面访问验证；未重复执行无改动的业务测试。旧构建缓存保存在忽略目录 artifacts/next-before-acceptance/。
-
-复现相同启动配置（先停止已运行的验收服务，避免端口冲突）：
+复现配置（当前服务正在运行，勿重复启动占用端口）：
 
 ```powershell
-Set-Location 'C:\Users\15537\Documents\ChatGPT\三城黑客松\astra-dev-spec'
+Set-Location 'C:/Users/15537/Documents/ChatGPT/三城黑客松/astra-dev-spec'
 $env:DATABASE_URL = 'sqlite:///./data/claude-acceptance.db'
 ./scripts/dev.ps1 -Fixture
 ```
 
-可先检查初始 8 单和 O5 金额，再到「智能体流水线」点击「立即运行」，生成规则审核草稿及日报。本次启动不预先替用户做决策或确认规则。
+测试使用隔离的 3001/8001 端口与 e2e.db，具体命令见 README。不要对 `app.db` 执行测试清库流程。
 
-完整测试命令见 README.md。运行 Playwright 前须停止当前 3000/8000 服务，Playwright 会自行启动并重建专用 e2e.db。不能对 app.db 使用测试清库流程。
+## 验证事实、边界与复核依据
 
-## 7. 给 Claude 的复核建议
+以下开发检查结果来自本轮 v0.2 实现阶段；启动后仅增加文档和证据，未重复执行没有改动的业务测试。37 项 pytest 与 9 项 Playwright 通过，并不证明所有输入、所有外部模型或所有平台都正确。
 
-请先阅读根目录 AGENTS.md 与 docs/TASKS.md，再按 SPEC > API > AI_PIPELINE > DESIGN > TASKS 对照源代码和验收证据。重点检查 Q-001 的边界、订单数据不外发、经济数字集中在 engine、规则审核到版本/重算的行为、审计链和真实服务异常处理。本报告是实现方的交接材料，不是独立第三方审计意见；若复核发现新增缺口，请按 AGENTS 的流程记录，勿把已有 DONE 状态当作无需检查的事实。
+## 已实现
+
+- 决策：指定采纳建议、必填补充说明、输入区域快捷键保护、决策沿用与双语审计。
+- 知识库：自动同步、FTS5 检索、手动条目、分语言编辑、查看和恢复系统版本；订单及影响单只读。
+- 工作台：知识问答、引用跳转、数字守卫及一次重试；订单数据默认关闭，主动开启才进入问答上下文。
+- 导入：CSV、标准 XLSX/PDF 本地解析，其他受支持文件先确认再调用模型；可编辑预览、逐行校验、确认入库、取消、清除原文件字节和过期清理。
+- 中英文界面、引擎文本适配、双语分诊/抽取及审计；版本升级为 0.2.0。
+
+## 验证结果
+
+| 检查 | 结果及范围 |
+|---|---|
+| 后端 Ruff | 通过 |
+| pytest | 37 passed，28.01 秒；包含原有 golden 和安全校验，外部 HTTP 用 respx 模拟 |
+| 前端 lint / Prettier / TypeScript | 通过 |
+| 生产构建 | 通过，生成 11 个路由；构建字体使用本地测试资源 |
+| Playwright | Windows Chromium，9 passed，54.4 秒；原有 2 项加 v0.2 的 7 项 |
+| 冒烟脚本 | 独立全新 fixture 数据库：1/3/4/5 PASS，2 FAIL（未配置模型），符合 T-9.5；退出码 1 为预期 |
+| 双语清单 | `i18n-review.md` 已生成，含前端全部 272 项及后端模板，译文待用户审阅 |
+
+测试使用独立 3001/8001 端口和 `backend/data/e2e.db`；冒烟使用另一个全新测试库。未清空用户的 `backend/data/app.db`。pytest 有一条 Starlette/httpx 弃用警告，测试通过。
+
+日志：`artifacts/validation/smoke-fixture.txt`、`artifacts/validation/smoke-server.log`。浏览器截图均为 1440×900，位于 `artifacts/screenshots/`。
+
+## 原反馈逐项处理
+
+| 反馈 | 状态 | 实现或证据 |
+|---|---|---|
+| P1 快捷键误触 | 已修复 | 输入区域屏蔽全局决策快捷键；E2E 确认 Ctrl+Backspace 删除词且无新增决策 |
+| P2 真实联调 | 尚未完成真实联调 | 已实现并验证冒烟脚本；没有真实 Key/线上采集端到端成功证据 |
+| P3 超长代码 | 已修复 | Prettier printWidth 110，lint 纳入格式检查，现有前端已格式化 |
+| P4 错误原因 | 已修复 | 流水线显示本次第一条错误；连接、超时、HTTP、JSON 分类并提供英文 |
+| P5 Q-001 | 已修复（A） | O5 卖方成本变化 +$16,000.00，毛利率变化 −17.8pp；后端与 E2E 验证 |
+| P6 测试连接提示 | 已修复 | 可解析但非 ok:true 与 JSON 解析失败分别提示，respx 验证 |
+| P7 无红单结论 | 已修复 | 无待处理红单时显示专用中英文句子，pytest 验证 |
+| P8 重复摘要 | 已修复 | 日报标题与摘要相同则不重复展示 |
+| P9 字体断言 | 修正已完成，Linux 待验证 | 排除名称以 Fallback 结尾的字体族；当前仅有 Windows E2E 通过证据 |
+| P10 表格与头部 | 已修复 | 分层首列 nowrap 并可横向滚动；头部符合 v0.2 格式，E2E 验证 |
+| P11 订单编号 | 按规格暂缓 | 保留 O5 等编号，避免改动历史数据和 golden |
+| P12 Logo | 已修复 | next/image priority，品牌版本 v0.2 |
+| P13 分诊计数 | 已修复 | 审计只取本次运行的相关结果 |
+| P14 草稿校验 | 已修复 | program_add 重复 id 和空 watch target_id 拒绝，pytest 验证 |
+
+## 主要截图
+
+| 功能 | 文件（相对仓库根目录） |
+|---|---|
+| 决策与补充说明 | `artifacts/screenshots/T-10.2-adopted.png`、`T-10.2-note.png` |
+| 知识库及来源变化 | `artifacts/screenshots/T-11.3.png`、`T-11.3-source-changed.png` |
+| 工作台及数字守卫 | `artifacts/screenshots/T-12.3.png`、`T-12.3-guard.png` |
+| 导入确认、预览、错误 | `artifacts/screenshots/T-12.4-consent.png`、`T-12.4.png`、`T-12.4-invalid.png` |
+| 英文七页面 | `artifacts/screenshots/T-13.1-{workbench,inbox,knowledge,brief,review,pipeline,settings}.png` |
+
+## 规格冲突和剩余边界
+
+- `TASKS_V02.md` T-12.2 写 PATCH，但 `V02_SPEC.md` §6.5 指定 PUT，§9 CORS 也只列 GET/POST/PUT/DELETE。按文档优先级实现 PUT；测试使用 PUT。
+- T-9.6 要求在 Linux 上执行 Playwright，当前环境为 Windows，因此保持 PARTIAL，不声明全部任务无条件完成。
+- 未使用真实模型及线上政策采集完成联调；PDF/图片真实识别质量仍取决于实际模型，离线夹具和 HTTP 模拟不能证明其真实识别质量。
+- 关税数字及日期保留项目演示快照，未独立核实现实有效性；计算逻辑、规则税率日期和 golden 期望值未改动。
+
+
+
+## 交给 Claude 的复核重点
+
+请以源代码及可复现结果为准，分别记录通过、失败和未验证项。先阅读 `AGENTS.md`、`docs/V02_SPEC.md`、`docs/TASKS_V02.md`。文档优先级：V02_SPEC > SPEC > API > AI_PIPELINE > DESIGN > TASKS_V02 > TASKS。
+
+1. 在原反馈逐项回归基础上，验证知识库编辑不改变计算、订单/影响单只读、来源变化与恢复系统版本。
+2. 验证工作台引用、数字守卫及重试；默认不发送订单数据，开启后才发送，敏感操作留审计。
+3. 验证 CSV/XLSX/标准 PDF 本地解析；需要模型的图片/PDF须先同意，再提取，预览编辑并校验后人工确认入库，取消与过期清理可用。
+4. 验证采纳具体建议、补充说明和输入区域快捷键；切换中英文后核对各页、模型提示与审计。
+5. 对真实模型、线上采集及 Linux E2E 单独验收；不要把离线夹具结果当作真实识别质量证据。现有模型配置不在交付文件中，不应在报告中披露 Key。
+
+附件截图的 Git 路径统一为 `docs/acceptance/v0.2/screenshots/`；上文 `artifacts/screenshots/` 是本机原始路径。不同截图来自不同数据库/操作阶段，计数不可直接跨截图比较。
+
+参考资料：`docs/i18n-review.md`、`docs/RELEASE_NOTES.md`、`docs/acceptance/Mariner-v0.1-验收反馈.md`。旧版交接报告已归档为 `docs/acceptance/ACCEPTANCE_V01_FOR_CLAUDE.md`，其中的 Q-001 阻塞与 v0.1 任务计数仅描述历史版本；Q-001 已按 v0.2 的 A 方案解决。
+
+本次没有新增待决策 Q 编号。已知未验证事项已如上列明，关税演示快照未被当作已核实的现实政策。

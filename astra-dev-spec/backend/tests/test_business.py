@@ -27,7 +27,7 @@ def test_counts_details_and_decisions(client):
     assert [(w["id"], w["severity"], w["impact_usd"], w["affected_order_ids"]) for w in watches] == [
         ("W_301_EXCLUSION_EXPIRY", "红", -16000, ["O5"]), ("W_232_ROBOTICS", "黄", None, ["O2"]), ("W_301_EXCESS_CAPACITY", "黄", None, ["O1"])]
     for kind in ("adopted", "needs_detail"):
-        assert client.post("/api/impacts/O5/decision", json={"decision": kind}).status_code == 200
+        assert client.post("/api/impacts/O5/decision", json={"decision": kind, **({"action_indices": [0, 2]} if kind == "adopted" else {"note": "Verify entry date"})}).status_code == 200
         assert client.get("/api/impacts/O5").json()["decision"] == kind
     assert len(client.get("/api/decisions").json()) == 2
     new_run = client.post("/api/runs").json()
@@ -64,7 +64,7 @@ def test_import(client):
 
 def test_concurrent_decisions_preserve_audit_chain(client):
     def submit(number):
-        return client.post(f"/api/impacts/O{number}/decision", json={"decision": "adopted"})
+        return client.post(f"/api/impacts/O{number}/decision", json={"decision": "dismissed"})
     with ThreadPoolExecutor(max_workers=4) as pool:
         responses = list(pool.map(submit, range(1, 9)))
     assert all(r.status_code == 200 for r in responses)

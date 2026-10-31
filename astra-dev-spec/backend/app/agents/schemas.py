@@ -13,6 +13,7 @@ class TriageResult(BaseModel):
     legal_status: LegalStatus | None
     needs_fulltext: bool
     one_line_zh: str = Field(max_length=60)
+    one_line_en: str | None = Field(default=None, max_length=200)
     evidence: list[Evidence] = Field(min_length=1)
     confidence: float = Field(ge=0, le=1)
 
@@ -22,4 +23,5 @@ class ExtractionResult(BaseModel):
     legal_status: LegalStatus
     change: RuleChange
     summary_zh: str = Field(max_length=120)
+    summary_en: str | None = Field(default=None, max_length=300)
     evidence: list[Evidence]

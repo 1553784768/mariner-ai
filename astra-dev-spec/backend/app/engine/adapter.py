@@ -27,7 +27,7 @@ def current_impacts(session, settings):
     return run, items
 
 
-def adapt(session, settings, impact, run):
+def adapt(session, settings, impact, run, lang="zh"):
     v, snapshot = dict(impact.payload), build_snapshot(session)
     order = v.pop("order_input")
     programs = {p["id"]: p for p in snapshot["programs"]}
@@ -68,20 +68,27 @@ def adapt(session, settings, impact, run):
         agent_chain.append(dict(agent=agent, status=state, at=max((s["finished_at"] for s in candidates if s["finished_at"]), default=None)))
     agent_chain += [dict(agent="impact", status="done", at=run.payload["created_at"]),
                     dict(agent="human", status="pending" if decision == "pending" else "done", at=v.get("decision_at"))]
-    return {**v, "run_id": run.id, "channel": order["channel"], "importer_of_record": order["importer_of_record"],
+    result = {**v, "run_id": run.id, "as_of": run.payload["as_of"],
+            "seller_cost_delta_usd": round(v["seller_cost_new_usd"] - v["seller_cost_baseline_usd"], 2),
+            "margin_delta_pp": round(v["margin_new_pct"] - v["margin_baseline_pct"], 2),
+            "adopted_actions": v.get("adopted_actions", []), "note": v.get("note"),
+            "channel": order["channel"], "importer_of_record": order["importer_of_record"],
             "layers": [dict(id=layer["id"], label=LAYER_LABELS.get(layer["id"], programs.get(layer["id"], {}).get("name", layer["id"])),
                             heading=layer["heading"], rate_pct=layer["rate"], duty_usd=layer["duty_usd"], refund_status=layer.get("refund_status")) for layer in v["layers"]],
             "checks": checks, "countdown": countdown, "chain": chain, "agent_chain": agent_chain, "sources": sources,
             "order": {k: order[k] for k in ("load_date", "quote_date", "customs_value_usd", "transport_mode", "tariff_clause")}}
+    from app.engine.i18n import impact_text
+    return impact_text(result, lang, session, snapshot)
 
 
-def watches(session, settings):
+def watches(session, settings, lang="zh"):
     _, impacts = current_impacts(session, settings)
     result = []
     rank = {"红": 0, "橙": 1, "黄": 2, "绿": 3}
     for wid, w in build_snapshot(session)["watch_items"].items():
         affected = [i.payload for i in impacts if wid in i.payload["watch_ids"]]
-        title, summary = WATCH_TEXT.get(wid, (w["title"], w["summary"]))
+        from app.engine.i18n import watch_text
+        title, summary = watch_text(session, wid, w, lang)
         result.append({**w, "id": wid, "title": title, "summary": summary,
                        "affected_order_ids": [i["order_id"] for i in affected],
                        "impact_usd": round(sum(i["profit_delta_usd"] for i in affected), 2) if w["legal_status"] in ("scheduled_expiry", "in_force", "signed_pending") else None,

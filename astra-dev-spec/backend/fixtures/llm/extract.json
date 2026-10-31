@@ -37,7 +37,8 @@
     "field": "legal_status",
     "quote": "is effective as of July 1, 2026"
    }
-  ]
+  ],
+  "summary_en": "From 2026-07-01, the coverage of China Section 301 exclusion note 20(vvv)(i)(20) is described by statistical number 8479.90.9591 to keep the original coverage; no rate change."
  },
  "2026-20510": {
   "document_number": "2026-20510",
@@ -57,6 +58,7 @@
     "field": "summary_zh",
     "quote": "did not terminate on July 6, 2026"
    }
-  ]
+  ],
+  "summary_en": "The China technology-transfer Section 301 actions have not terminated and remain in effect; they may change after the four-year review; this notice changes no rate."
  }
 }

@@ -166,7 +166,17 @@ class OrderRef(BaseModel):
     tariff_clause: str
 
 
+class AdoptedAction(BaseModel):
+    index: int
+    text: str
+
+
 class ImpactDetail(ImpactCard):
+    as_of: str
+    seller_cost_delta_usd: float
+    margin_delta_pp: float
+    adopted_actions: list[AdoptedAction] = Field(default_factory=list)
+    note: str | None = None
     rate_baseline_user_pct: float
     rate_baseline_rules_pct: float
     rate_new_pct: float
@@ -200,9 +210,11 @@ class ImpactDetail(ImpactCard):
 class DecisionRequest(BaseModel):
     decision: Literal["adopted", "dismissed", "needs_detail"]
     note: str | None = Field(default=None, max_length=500)
+    action_indices: list[int] | None = None
 
 
 class Decision(BaseModel):
+    adopted_actions: list[AdoptedAction] = Field(default_factory=list)
     order_id: str
     run_id: str
     decision: DecisionKind
@@ -218,13 +230,16 @@ class DecisionRow(Decision):
 
 
 class AuditEvent(BaseModel):
+    summary_zh: str | None = None
+    summary_en: str | None = None
     seq: int
     at: str
     business_date: str
     actor: str
     action: Literal["ORDERS_IMPORTED", "RUN_CREATED", "COLLECTED", "TRIAGED", "EXTRACTED", "VALIDATED",
                     "RULE_APPROVED", "RULE_REJECTED", "RULE_NEEDS_DETAIL", "BRIEF_PUBLISHED", "DECIDED",
-                    "LLM_SETTINGS_CHANGED"]
+                      "LLM_SETTINGS_CHANGED", "KB_EDITED", "KB_RESTORED", "KB_CREATED", "KB_DELETED",
+                      "CHAT_ORDER_DATA_SENT", "IMPORT_SENT_TO_MODEL"]
     entity: str
     summary: str
     prev_hash: str

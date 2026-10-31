@@ -11,3 +11,8 @@ __pycache__/
 test-results/
 playwright-report/
 *.tsbuildinfo
+
+.next-e2e/
+.next-build/
+
+.next-e2e-v02/

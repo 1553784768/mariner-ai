@@ -19,6 +19,7 @@ from app.db.store import build_snapshot, rows
 from app.engine.adapter import current_impacts
 from app.engine.service import identifier
 from app.settings import now
+from app.knowledge.service import sync_kb
 
 AGENTS = ("collector_fr", "collector_pi", "collector_usitc", "triage", "extract", "validate", "brief")
 EXTRACT_CATEGORIES = {"rate_change", "exclusion", "scope_change", "investigation", "negotiation", "needs_fulltext", "comment_request", "procedure", "refund"}
@@ -71,7 +72,7 @@ class Pipeline:
         key = uuid4().hex
         session.add(m.AgentStep(id=key, business_date=str(self.settings.today), payload=dict(id=key, pipeline_run_id=run_id,
             business_date=str(self.settings.today), agent=agent, document_number=number, started_at=start, finished_at=now(), status=status,
-            model=model, prompt_version=f"{agent}_v1" if agent in ("triage", "extract") else None,
+            model=model, prompt_version=f"{agent}_v2" if agent in ("triage", "extract") else None,
             input_sha256=hashlib.sha256(user.encode("utf-8")).hexdigest(), output_json=output, error=error,
             tokens_in=usage.get("prompt_tokens"), tokens_out=usage.get("completion_tokens"), latency_ms=elapsed)))
 
@@ -85,6 +86,7 @@ class Pipeline:
             docs = [d for d in docs if session.get(m.RuleDraft, f"DRAFT-{d.id}") is None and
                     (t := session.get(m.TriageRecord, d.id)) and t.payload["relevant"] and t.payload["category"] in EXTRACT_CATEGORIES]
         result = counts(input=len(docs))
+        relevant = 0
         for doc in docs:
             start, clock, user = now(), time.monotonic(), ""
             output = error = None
@@ -97,19 +99,20 @@ class Pipeline:
                     user_data = dict(document_number=doc.id, title=doc.payload["title"], publication_date=doc.payload.get("publication_date"), truncated=len(text) > 120000, text=text[:120000])
                     schema = ExtractionResult
                 user = json.dumps(user_data, ensure_ascii=False)
-                output = client.complete_json(system=(PROMPTS / f"{role}_v1.md").read_text(encoding="utf-8"), user=user, schema=schema, fixture_key=doc.id, role=role).model_dump()
+                output = client.complete_json(system=(PROMPTS / f"{role}_v2.md").read_text(encoding="utf-8"), user=user, schema=schema, fixture_key=doc.id, role=role).model_dump()
                 if output["document_number"] != doc.id:
                     raise ValueError("Document number mismatch")
                 if role == "triage":
                     merged = json.dumps(user_data, ensure_ascii=False)
                     if not all(e["quote"] in merged for e in output["evidence"]):
                         raise ValueError("Triage evidence does not match metadata")
+                    relevant += output["relevant"]
                     session.add(m.TriageRecord(id=doc.id, business_date=str(self.settings.today), payload=output))
                 else:
                     t = session.get(m.TriageRecord, doc.id).payload
                     draft = dict(id=f"DRAFT-{doc.id}", source_document_number=doc.id, source_url=doc.payload.get("html_url") or doc.payload.get("pdf_url"),
                                  title=t["one_line_zh"], original_title=doc.payload["title"], legal_status=output["legal_status"], change=output["change"],
-                                 summary_zh=output["summary_zh"], evidence=[{**e, "verified": False} for e in output["evidence"]], validation=[],
+                                 summary_zh=output["summary_zh"], summary_en=output["summary_en"], title_en=t.get("one_line_en"), evidence=[{**e, "verified": False} for e in output["evidence"]], validation=[],
                                  status="draft", impact_preview=None, created_at=now(), source_text=text, highlights=[], pipeline_run_id=run_id)
                     session.add(m.RuleDraft(id=draft["id"], business_date=str(self.settings.today), payload=draft))
                 result["output"] += 1
@@ -123,7 +126,6 @@ class Pipeline:
             self.record(session, run_id, role, doc.id, start, status, user, output, client.model, error, round((time.monotonic()-clock)*1000, 2), client.usage)
             session.flush()
         if role == "triage":
-            relevant = sum(t.payload["relevant"] for t in rows(session, m.TriageRecord))
             summary = f'分诊 {result["output"]} 篇，相关 {relevant} 篇，无夹具跳过 {result["skipped"]} 篇'
         else:
             summary = f'生成草稿 {result["output"]} 篇，无夹具跳过 {result["skipped"]} 篇'
@@ -146,6 +148,8 @@ class Pipeline:
                             append(session, str(self.settings.today), "COLLECTED", "税则版本检查", run_id, f'新增 {result["output"]} 篇')
                         elif agent in ("triage", "extract"):
                             result = self.run_agent(session, run_id, agent)
+                            failures = [r.payload["error"] for r in rows(session, m.AgentStep) if r.payload["pipeline_run_id"] == run_id and r.payload["agent"] == agent and r.payload.get("error")]
+                            message = failures[0] if failures else None
                         elif agent == "validate":
                             drafts = [d for d in rows(session, m.RuleDraft) if d.payload.get("pipeline_run_id") == run_id]
                             _, impacts = current_impacts(session, self.settings)
@@ -175,6 +179,7 @@ class Pipeline:
                 steps = run.payload["steps"]
                 status = "failed" if all(s["status"] == "failed" for s in steps[:3]) else "partial" if any(s["status"] in ("failed", "skipped_no_fixture") or s["counts"]["skipped"] for s in steps) else "succeeded"
                 run.payload = {**run.payload, "status": status, "finished_at": now()}
+                sync_kb(session, self.settings)
         finally:
             self.lock.release()
 

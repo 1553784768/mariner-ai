@@ -65,6 +65,7 @@ def import_orders(file: UploadFile = File(...), session=Depends(session_dep), se
             session.add(m.Order(id=record["order_id"], business_date=str(settings.today), payload=record))
             imported += 1
     append(session, str(settings.today), "ORDERS_IMPORTED", "本地用户", "orders", f"导入 {imported} 行，更新 {updated} 行")
+    session.flush()
     run = create_run(session, settings)
     return dict(imported=imported, updated=updated, run_id=run.id, errors=[])
 
@@ -80,7 +81,7 @@ def get_run(session=Depends(session_dep), settings=Depends(settings_dep)):
 
 
 @router.get("/impacts", response_model=list[s.ImpactCard])
-def impacts(risk: str | None = None, incoterm_group: Literal["all", "ddp", "non_ddp"] = "all",
+def impacts(lang: Literal["zh", "en"] = "zh", risk: str | None = None, incoterm_group: Literal["all", "ddp", "non_ddp"] = "all",
             decision: s.DecisionKind | None = None, q: str = "", session=Depends(session_dep), settings=Depends(settings_dep)):
     if risk and any(r not in "红橙黄绿" or len(r) != 1 for r in risk.split(",")):
         raise ApiException(400, "BAD_REQUEST", "请求参数不合法")
@@ -96,17 +97,17 @@ def impacts(risk: str | None = None, incoterm_group: Literal["all", "ddp", "non_
             continue
         if q and not any(q.lower() in v[k].lower() for k in ("order_id", "product", "hts10")):
             continue
-        result.append(adapt(session, settings, item, run))
+        result.append(adapt(session, settings, item, run, lang))
     return result
 
 
 @router.get("/impacts/{order_id}", response_model=s.ImpactDetail)
-def detail(order_id: str, session=Depends(session_dep), settings=Depends(settings_dep)):
+def detail(order_id: str, lang: Literal["zh", "en"] = "zh", session=Depends(session_dep), settings=Depends(settings_dep)):
     run, items = current_impacts(session, settings)
     item = next((i for i in items if i.order_id == order_id), None)
     if item is None:
         missing("订单", order_id)
-    return adapt(session, settings, item, run)
+    return adapt(session, settings, item, run, lang)
 
 
 @router.post("/impacts/{order_id}/decision", response_model=s.Decision)
@@ -115,25 +116,40 @@ def decide(order_id: str, body: s.DecisionRequest, session=Depends(session_dep),
     item = next((i for i in items if i.order_id == order_id), None)
     if item is None:
         missing("订单", order_id)
+    if body.decision == "adopted":
+        indices = body.action_indices
+        if not indices or len(indices) != len(set(indices)) or any(i < 0 or i >= len(item.payload["actions"]) for i in indices):
+            raise ApiException(400, "BAD_REQUEST", "请求参数不合法")
+    elif body.action_indices is not None:
+        raise ApiException(400, "BAD_REQUEST", "请求参数不合法")
+    note = body.note.strip() if body.note else None
+    if body.decision == "needs_detail" and not note:
+        raise ApiException(400, "BAD_REQUEST", "请求参数不合法")
+    adopted = [dict(index=i, text=item.payload["actions"][i]) for i in sorted(body.action_indices or [])]
     timestamp = now()
-    item.payload = {**item.payload, "decision": body.decision, "decision_at": timestamp, "decision_business_date": str(settings.today)}
+    item.payload = {**item.payload, "decision": body.decision, "decision_at": timestamp, "decision_business_date": str(settings.today), "adopted_actions": adopted, "note": note}
     label = {"adopted": "已采纳", "dismissed": "不处理", "needs_detail": "需补充"}[body.decision]
     summary = f"{order_id} · {label}" + (f" · 备注：{body.note}" if body.note else "")
+    if body.decision == "adopted":
+        summary = f"{order_id} · 已采纳 · 第 " + "、".join(f'{a["index"]+1:02}' for a in adopted) + " 条"
+    elif body.decision == "needs_detail":
+        summary = f"{order_id} · 需补充 · 补充：{note}"
     event = append(session, str(settings.today), "DECIDED", "本地用户", order_id, summary)
-    value = dict(order_id=order_id, run_id=run.id, decision=body.decision, note=body.note, decided_at=timestamp,
+    value = dict(order_id=order_id, run_id=run.id, decision=body.decision, note=note, adopted_actions=adopted, decided_at=timestamp,
                  actor="本地用户", audit_hash=event["hash"], product=item.payload["product"], profit_delta_usd=item.payload["profit_delta_usd"])
     session.add(m.Decision(id=uuid4().hex, business_date=str(settings.today), payload=value))
     return value
 
 
 @router.get("/decisions", response_model=list[s.DecisionRow])
-def decisions(limit: int = Query(20, ge=1, le=200), offset: int = Query(0, ge=0), session=Depends(session_dep)):
-    return sorted([r.payload for r in rows(session, m.Decision)], key=lambda r: r["decided_at"], reverse=True)[offset:offset+limit]
+def decisions(limit: int = Query(20, ge=1, le=200), offset: int = Query(0, ge=0), lang: Literal["zh", "en"] = "zh", session=Depends(session_dep)):
+    from app.localization import localize
+    return [localize(r, "decision", lang, session) for r in sorted([r.payload for r in rows(session, m.Decision)], key=lambda r: r["decided_at"], reverse=True)[offset:offset+limit]]
 
 
 @router.get("/audit", response_model=list[s.AuditEvent])
-def audit(limit: int = Query(50, ge=1, le=200), session=Depends(session_dep)):
-    return [r.payload for r in sorted(rows(session, m.AuditEvent), key=lambda r: r.seq, reverse=True)[:limit]]
+def audit(lang: Literal["zh", "en"] = "zh", limit: int = Query(50, ge=1, le=200), session=Depends(session_dep)):
+    return [{**r.payload, "summary": r.payload.get("summary_en", r.payload["summary"]) if lang == "en" else r.payload["summary"]} for r in sorted(rows(session, m.AuditEvent), key=lambda r: r.seq, reverse=True)[:limit]]
 
 
 @router.get("/rules/snapshot")
@@ -142,5 +158,5 @@ def snapshot(session=Depends(session_dep)):
 
 
 @router.get("/watch-items", response_model=list[s.WatchItem])
-def watch_items(session=Depends(session_dep), settings=Depends(settings_dep)):
-    return watches(session, settings)
+def watch_items(lang: Literal["zh", "en"] = "zh", session=Depends(session_dep), settings=Depends(settings_dep)):
+    return watches(session, settings, lang)

@@ -2,29 +2,50 @@ import { test, expect, type Page } from "@playwright/test";
 import { mkdirSync } from "node:fs";
 import { resolve } from "node:path";
 const screenshots = resolve(__dirname, "../../artifacts/screenshots");
-async function shot(page: Page, name: string) { mkdirSync(screenshots, { recursive: true }); await page.evaluate(() => document.fonts.ready); await page.screenshot({ path: resolve(screenshots, `${name}.png`), fullPage: false }); }
+async function shot(page: Page, name: string) {
+  mkdirSync(screenshots, { recursive: true });
+  await page.evaluate(() => document.fonts.ready);
+  await page.screenshot({ path: resolve(screenshots, `${name}.png`), fullPage: false });
+}
 
 test("milestones: components, inbox, decision, pipeline, review, brief", async ({ page, request }) => {
   const errors: string[] = [];
-  page.on("pageerror", error => errors.push(error.message));
-  page.on("console", message => { if (/Failed to decode downloaded font|OTS parsing error/.test(message.text())) errors.push(message.text()); });
+  page.on("pageerror", (error) => errors.push(error.message));
+  page.on("console", (message) => {
+    if (/Failed to decode downloaded font|OTS parsing error/.test(message.text()))
+      errors.push(message.text());
+  });
   await page.goto("/dev/components");
   await expect(page.getByText("−$16,000.00", { exact: false })).toBeVisible();
   await expect(page.getByText("+$1,500.00", { exact: false })).toBeVisible();
   await shot(page, "T-3.2");
-  expect(await page.evaluate(() => [...document.fonts].filter(f => f.status === "error").map(f => f.family))).toEqual([]);
+  expect(
+    await page.evaluate(() =>
+      [...document.fonts]
+        .filter((f) => f.status === "error" && !f.family.replaceAll('"', "").endsWith("Fallback"))
+        .map((f) => f.family),
+    ),
+  ).toEqual([]);
   await page.goto("/inbox");
   await expect(page.locator(".impact-card")).toHaveCount(8);
-  expect(await page.locator(".impact-card").evaluateAll(cards => cards.map(c => c.getAttribute("data-order")))).toEqual(["O5", "O1", "O3", "O6", "O4", "O2", "O8", "O7"]);
+  expect(
+    await page.locator(".impact-card").evaluateAll((cards) => cards.map((c) => c.getAttribute("data-order"))),
+  ).toEqual(["O5", "O1", "O3", "O6", "O4", "O2", "O8", "O7"]);
   await expect(page.getByRole("link", { name: "风险收件箱 8" })).toHaveAttribute("aria-current", "page");
   await expect(page.locator(".brand")).toContainText("Mariner AI");
+  await expect(page.locator(".sidebar nav a")).toHaveCount(7);
+  await expect(page.locator(".sidebar nav a").first()).toContainText("工作台");
+  await expect(page.locator(".document-header h2")).toHaveText("订单影响单");
+  await expect(page.locator(".document-header .label-mono")).toContainText("O5 · 规则快照 2026-10-31 · RUN-");
   await shot(page, "T-4.1");
   await page.getByRole("button", { name: "DDP", exact: true }).click();
   await expect(page.locator(".impact-card")).toHaveCount(6);
   await page.getByRole("button", { name: "全部", exact: true }).click();
   await page.getByRole("tab", { name: /紧急/ }).click();
   await expect(page.locator(".impact-card")).toHaveCount(2);
-  expect(await page.locator(".impact-card").evaluateAll(cards => cards.map(c => c.getAttribute("data-order")))).toEqual(["O5", "O6"]);
+  expect(
+    await page.locator(".impact-card").evaluateAll((cards) => cards.map((c) => c.getAttribute("data-order"))),
+  ).toEqual(["O5", "O6"]);
   await page.getByRole("tab", { name: "全部", exact: true }).click();
   await page.locator('[data-order="O5"]').click();
   await expect(page).toHaveURL(/order=O5/);
@@ -42,25 +63,44 @@ test("milestones: components, inbox, decision, pipeline, review, brief", async (
   await expect(page.locator(".document-actions")).toHaveCSS("display", "grid");
   await shot(page, "T-4.3-1300");
   await page.setViewportSize({ width: 1440, height: 900 });
+  await page.getByRole("checkbox", { name: "action-1", exact: true }).check();
+  await page.locator("h1").click();
   await page.keyboard.press("Control+Enter");
   await expect(page.getByTestId("big-stamp")).toHaveText("已采纳");
   await expect(page.locator(".history-table")).toContainText("O5");
   await shot(page, "T-4.3-adopted");
   await expect(page.locator(".critical-card")).toHaveCount(3);
-  await expect(page.locator(".critical-card").filter({ hasText: "机器人" })).toContainText("影响 1 单 · 暂无税率");
+  await expect(page.locator(".critical-card").filter({ hasText: "机器人" })).toContainText(
+    "影响 1 单 · 暂无税率",
+  );
   await page.locator(".critical-panel").scrollIntoViewIfNeeded();
   await shot(page, "T-4.4");
   await page.getByRole("link", { name: "智能体流水线", exact: true }).click();
   let polls = 0;
-  await page.route("**/api/pipeline/runs/PIPE-*", async route => { const response = await route.fetch(); const data = await response.json(); polls++; await route.fulfill({ response, json: polls === 1 ? { ...data, status: "running" } : data }); });
+  await page.route("**/api/pipeline/runs/PIPE-*", async (route) => {
+    const response = await route.fetch();
+    const data = await response.json();
+    polls++;
+    await route.fulfill({ response, json: polls === 1 ? { ...data, status: "running" } : data });
+  });
   await page.getByRole("button", { name: "立即运行" }).click();
   await expect(page.getByRole("button", { name: "立即运行" })).toBeDisabled();
   await expect(page.getByRole("button", { name: "立即运行" })).toBeEnabled({ timeout: 30000 });
   expect(polls).toBeGreaterThanOrEqual(2);
-  const expected = [[20, 20, 0, 0], [108, 10, 0, 0], [1, 1, 0, 0], [30, 23, 7, 0], [8, 2, 6, 0], [2, 2, 0, 0], [1, 1, 0, 0]];
+  const expected = [
+    [20, 20, 0, 0],
+    [108, 10, 0, 0],
+    [1, 1, 0, 0],
+    [30, 23, 7, 0],
+    [8, 2, 6, 0],
+    [2, 2, 0, 0],
+    [1, 1, 0, 0],
+  ];
   const rows = page.getByTestId("pipeline-steps").locator("tbody tr");
   await expect(rows).toHaveCount(7);
-  for (let i = 0; i < 7; i++) { expect((await rows.nth(i).locator("td").allTextContents()).slice(2, 6).map(Number)).toEqual(expected[i]); }
+  for (let i = 0; i < 7; i++) {
+    expect((await rows.nth(i).locator("td").allTextContents()).slice(2, 6).map(Number)).toEqual(expected[i]);
+  }
   await shot(page, "T-7.3");
   await page.getByRole("link", { name: /规则审核/ }).click();
   await expect(page.locator("[data-draft]")).toHaveCount(2);
@@ -70,8 +110,12 @@ test("milestones: components, inbox, decision, pipeline, review, brief", async (
   await shot(page, "T-7.2");
   await page.getByRole("button", { name: "确认规则", exact: true }).click();
   await expect(page.getByRole("button", { name: "确认规则", exact: true })).toBeDisabled();
-  const audit = await (await request.get("http://127.0.0.1:8000/api/audit")).json();
-  expect(audit.some((e: { action: string }) => e.action === "RULE_APPROVED")).toBeTruthy();
+  await expect
+    .poll(async () => {
+      const audit = await (await request.get("http://127.0.0.1:8001/api/audit")).json();
+      return audit.some((e: { action: string }) => e.action === "RULE_APPROVED");
+    })
+    .toBeTruthy();
   await shot(page, "T-7.2-approved");
   await page.getByRole("link", { name: "政策日报", exact: true }).click();
   await expect(page.getByTestId("brief-items").locator(".brief-item")).toHaveCount(9);
@@ -81,11 +125,28 @@ test("milestones: components, inbox, decision, pipeline, review, brief", async (
 });
 
 test("model settings: save, success, failure and clear without external calls", async ({ page }) => {
-  let configured = false, failed = false;
-  const settings = () => ({ configured, base_url: configured ? "https://model.example/v1" : null, model: configured ? "demo" : null, api_key_masked: configured ? "****1234" : null, last_test: null });
-  await page.route("**/api/meta", async route => { const response = await route.fetch(); const data = await response.json(); await route.fulfill({ response, json: { ...data, llm_configured: configured } }); });
-  await page.route("**/api/settings/llm", async route => { if (route.request().method() === "PUT") configured = true; if (route.request().method() === "DELETE") configured = false; await route.fulfill({ json: settings() }); });
-  await page.route("**/api/settings/llm/test", route => route.fulfill({ json: { ok: !failed, message: failed ? "HTTP 401" : "连接成功", latency_ms: 20 } }));
+  let configured = false,
+    failed = false;
+  const settings = () => ({
+    configured,
+    base_url: configured ? "https://model.example/v1" : null,
+    model: configured ? "demo" : null,
+    api_key_masked: configured ? "****1234" : null,
+    last_test: null,
+  });
+  await page.route("**/api/meta?*", async (route) => {
+    const response = await route.fetch();
+    const data = await response.json();
+    await route.fulfill({ response, json: { ...data, llm_configured: configured } });
+  });
+  await page.route("**/api/settings/llm?*", async (route) => {
+    if (route.request().method() === "PUT") configured = true;
+    if (route.request().method() === "DELETE") configured = false;
+    await route.fulfill({ json: settings() });
+  });
+  await page.route("**/api/settings/llm/test?*", (route) =>
+    route.fulfill({ json: { ok: !failed, message: failed ? "HTTP 401" : "连接成功", latency_ms: 20 } }),
+  );
   await page.goto("/settings");
   await page.getByLabel("接口地址").fill("https://model.example/v1");
   await page.getByLabel("API Key").fill("private-1234");

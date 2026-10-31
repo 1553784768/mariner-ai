@@ -1,3 +1,5 @@
+from typing import Literal
+from app.localization import localize
 from fastapi import APIRouter, Depends, Request
 
 from app.api import schemas as s
@@ -15,41 +17,41 @@ router = APIRouter(prefix="/api")
 
 
 @router.post("/pipeline/runs", response_model=s.PipelineRun, status_code=202)
-def start_pipeline(request: Request):
-    return request.app.state.pipeline.start()
+def start_pipeline(request: Request, lang: Literal["zh", "en"] = "zh"):
+    return localize(request.app.state.pipeline.start(), "pipeline", lang, None)
 
 
 @router.get("/pipeline/runs/latest", response_model=s.PipelineRun)
-def latest_pipeline(session=Depends(session_dep)):
+def latest_pipeline(lang: Literal["zh", "en"] = "zh", session=Depends(session_dep)):
     values = rows(session, m.PipelineRun)
     if not values:
         missing("流水线", "latest")
-    return max(values, key=lambda r: r.payload["started_at"]).payload
+    return localize(max(values, key=lambda r: r.payload["started_at"]).payload, "pipeline", lang, session)
 
 
 @router.get("/pipeline/runs/{run_id}", response_model=s.PipelineRun)
-def pipeline_detail(run_id: str, session=Depends(session_dep)):
+def pipeline_detail(run_id: str, lang: Literal["zh", "en"] = "zh", session=Depends(session_dep)):
     record = session.get(m.PipelineRun, run_id)
     if record is None:
         missing("流水线", run_id)
-    return record.payload
+    return localize(record.payload, "pipeline", lang, session)
 
 
 @router.get("/rule-drafts", response_model=list[s.RuleDraft])
-def drafts(status: str | None = None, session=Depends(session_dep)):
+def drafts(lang: Literal["zh", "en"] = "zh", status: str | None = None, session=Depends(session_dep)):
     rank = {"draft": 0, "needs_detail": 1, "approved": 2, "rejected": 3}
     if status and status not in rank:
         raise ApiException(400, "BAD_REQUEST", "请求参数不合法")
     values = sorted([r.payload for r in rows(session, m.RuleDraft) if not status or r.payload["status"] == status], key=lambda r: r["created_at"], reverse=True)
-    return sorted(values, key=lambda r: rank[r["status"]])
+    return [localize(v, "draft", lang, session) for v in sorted(values, key=lambda r: rank[r["status"]])]
 
 
 @router.get("/rule-drafts/{draft_id}", response_model=s.RuleDraftDetail)
-def draft_detail(draft_id: str, session=Depends(session_dep)):
+def draft_detail(draft_id: str, lang: Literal["zh", "en"] = "zh", session=Depends(session_dep)):
     record = session.get(m.RuleDraft, draft_id)
     if record is None:
         missing("草稿", draft_id)
-    return record.payload
+    return localize(record.payload, "draft", lang, session)
 
 
 @router.post("/rule-drafts/{draft_id}/review", response_model=s.RuleDraft)
@@ -77,6 +79,8 @@ def review(draft_id: str, body: s.ReviewRequest, session=Depends(session_dep), s
         state, action, summary = ("rejected", "RULE_REJECTED", f"驳回 {number}") if body.action == "reject" else ("needs_detail", "RULE_NEEDS_DETAIL", f"{number} 需补充")
         record.payload = {**draft, "status": state}
         append(session, str(settings.today), action, "本地用户", draft_id, summary)
+    from app.knowledge.service import sync_kb
+    sync_kb(session, settings)
     return record.payload
 
 
@@ -86,17 +90,17 @@ def brief_dates(session=Depends(session_dep)):
 
 
 @router.get("/briefs/latest", response_model=s.Brief)
-def latest_brief(session=Depends(session_dep), settings=Depends(settings_dep)):
+def latest_brief(lang: Literal["zh", "en"] = "zh", session=Depends(session_dep), settings=Depends(settings_dep)):
     current_impacts(session, settings)
     values = rows(session, m.Brief)
     if not values:
         missing("日报", "latest")
-    return max(values, key=lambda r: r.id).payload
+    return localize(max(values, key=lambda r: r.id).payload, "brief", lang, session)
 
 
 @router.get("/briefs/{day}", response_model=s.Brief)
-def brief_detail(day: str, session=Depends(session_dep)):
+def brief_detail(day: str, lang: Literal["zh", "en"] = "zh", session=Depends(session_dep)):
     record = session.get(m.Brief, day)
     if record is None:
         missing("日报", day)
-    return record.payload
+    return localize(record.payload, "brief", lang, session)

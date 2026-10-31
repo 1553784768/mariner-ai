@@ -20,6 +20,8 @@ def apply_change(snapshot, change, published, legal_status, title, summary):
     if kind in ("program_add", "program_update"):
         existing = next((p for p in result["programs"] if p["id"] == target), None)
         if kind == "program_add":
+            if existing or not target or payload.get("id") != target:
+                raise ValueError("Invalid or duplicate program id")
             value = {**payload, "published": published}
             result["programs"].append(value)
         else:
@@ -40,6 +42,8 @@ def apply_change(snapshot, change, published, legal_status, title, summary):
             changes.append(("hts_profile", target, value))
             outcome = "新建规则版本"
     elif kind == "watch_item_upsert":
+        if not target or not target.strip():
+            raise ValueError("Missing watch item id")
         targets = payload.pop("hts_targets", [])
         certainty = {"in_force": 1., "court_ruling": 1., "procedural": 1., "signed_pending": .9,
                      "scheduled_expiry": .9, "proposed": .4, "investigation": .2, "negotiation_no_tariff": .1}[legal_status]

@@ -1,0 +1,7 @@
+1. PASS Health: Local health response
+2. FAIL Model connection: No model configured (未配置模型)
+3. PASS Policy pipeline: status=partial, triage errors=0
+4. PASS Collector response: collector_fr input=20, collector_pi input=108
+5. PASS Knowledge-grounded chat: answer length=90, guard.ok=True
+
+Exit code: 1

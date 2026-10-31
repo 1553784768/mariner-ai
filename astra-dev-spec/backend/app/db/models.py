@@ -1,4 +1,4 @@
-from sqlalchemy import JSON, Integer, String, UniqueConstraint
+from sqlalchemy import JSON, Integer, String, UniqueConstraint, LargeBinary
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
@@ -81,3 +81,21 @@ class PipelineRun(Record, Base):
 
 class Brief(Record, Base):
     __tablename__ = "briefs"
+
+
+class KbEntry(Record, Base):
+    __tablename__ = "kb_entries"
+
+
+class ChatConversation(Record, Base):
+    __tablename__ = "chat_conversations"
+
+
+class ChatMessage(Record, Base):
+    __tablename__ = "chat_messages"
+    conversation_id: Mapped[str] = mapped_column(String, index=True)
+
+
+class ImportJob(Record, Base):
+    __tablename__ = "import_jobs"
+    content: Mapped[bytes | None] = mapped_column(LargeBinary, nullable=True)

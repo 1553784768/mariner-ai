@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     as_of_date: date | None = None
     collector_mode: str = "live"
     scheduler_enabled: bool = True
+    local_port: int = 8000
     cors_origins: str = "http://127.0.0.1:3000,http://localhost:3000"
 
     @property

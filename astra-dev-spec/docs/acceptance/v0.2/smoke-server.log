@@ -1,0 +1,11 @@
+INFO:     Started server process [30988]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8002 (Press CTRL+C to quit)
+INFO:     127.0.0.1:64196 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64198 - "GET /api/health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64200 - "GET /api/settings/llm HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64202 - "POST /api/pipeline/runs HTTP/1.1" 202 Accepted
+INFO:     127.0.0.1:64205 - "GET /api/pipeline/runs/PIPE-20261031-183726-e561 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64208 - "POST /api/chat/conversations HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64210 - "POST /api/chat/conversations/55722a623e67443a99d27fa8042b9643/messages HTTP/1.1" 200 OK

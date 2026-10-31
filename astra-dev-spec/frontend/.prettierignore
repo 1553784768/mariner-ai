@@ -1,0 +1,13 @@
+node_modules
+.next
+package-lock.json
+src/lib/api-types.ts
+next-env.d.ts
+test-results
+playwright-report
+public
+
+.next-e2e/
+.next-build/
+
+.next-e2e-v02/

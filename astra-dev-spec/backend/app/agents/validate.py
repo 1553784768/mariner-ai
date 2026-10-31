@@ -31,6 +31,8 @@ def validate(draft, source, published, snapshot, settings, impacts):
         required.add("change.target_id")
     if required:
         set_check("V2", "pass" if required <= {e["field"] for e in evidence} else "fail")
+    if change["change_type"] == "watch_item_upsert" and not (change["target_id"] or "").strip():
+        set_check("V2", "fail")
     starts = [v for k, v in flat.items() if k.endswith(".valid_from") and v]
     transits = [v for k, v in flat.items() if k.endswith(".in_transit_exception") and v]
     if starts or transits:
@@ -62,7 +64,9 @@ def validate(draft, source, published, snapshot, settings, impacts):
             conflict = overlap and payload["rate_pct"] != current["rate_pct"]
         set_check("V7", "warn" if conflict else "pass")
     if change["change_type"] == "program_add":
-        set_check("V8", "pass" if PROGRAM_FIELDS <= payload.keys() else "fail")
+        valid = (PROGRAM_FIELDS <= payload.keys() and payload.get("id") == change["target_id"]
+                 and bool(payload.get("id")) and not any(p["id"] == payload.get("id") for p in snapshot["programs"]))
+        set_check("V8", "pass" if valid else "fail")
     if change["change_type"] == "hts_profile_update" and "s301_exclusion" in payload and any(digits(k) == digits(change["target_id"]) for k in snapshot["hts_profiles"]):
         set_check("V9", "pass" if payload["s301_exclusion"] and payload["s301_exclusion"].get("valid_to") else "fail")
     highlights = []

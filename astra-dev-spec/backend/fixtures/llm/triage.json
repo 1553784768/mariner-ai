@@ -18,7 +18,8 @@
     "quote": "Pleasure Vessels of Malta Entitled To Cruising Licenses"
    }
   ],
-  "confidence": 0.95
+  "confidence": 0.95,
+  "one_line_en": "Rule on cruising licenses for Maltese pleasure vessels; unrelated to import duties on goods."
  },
  "2026-21853": {
   "document_number": "2026-21853",
@@ -35,7 +36,8 @@
     "quote": "Customs Broker Permit User Fee Payment for 2027"
    }
   ],
-  "confidence": 0.9
+  "confidence": 0.9,
+  "one_line_en": "Notice on customs broker permit user fees; does not affect duties on goods."
  },
  "2026-21755": {
   "document_number": "2026-21755",
@@ -60,7 +62,8 @@
     "quote": "China's Targeting of the Maritime, Logistics, and Shipbuilding Sectors"
    }
   ],
-  "confidence": 0.8
+  "confidence": 0.8,
+  "one_line_en": "USTR seeks comments on further suspending the Section 301 action on China's maritime, logistics and shipbuilding sectors; read the full text to see whether goods duties are affected."
  },
  "2026-21600": {
   "document_number": "2026-21600",
@@ -81,7 +84,8 @@
     "quote": "New Postal Informal Entry Process; Delayed Compliance Extension"
    }
   ],
-  "confidence": 0.85
+  "confidence": 0.85,
+  "one_line_en": "CBP extends the compliance period for the new postal informal entry process; affects only goods sent by mail; read the full text for the new date."
  },
  "2026-21570": {
   "document_number": "2026-21570",
@@ -102,7 +106,8 @@
     "quote": "Modification of the Test of the New Electronic Informal Entry Process for Mail"
    }
   ],
-  "confidence": 0.8
+  "confidence": 0.8,
+  "one_line_en": "CBP modifies the test of the electronic informal entry process for mail; affects only goods sent by mail."
  },
  "2026-21408": {
   "document_number": "2026-21408",
@@ -119,7 +124,8 @@
     "quote": "as a Commercial Laboratory"
    }
   ],
-  "confidence": 0.95
+  "confidence": 0.95,
+  "one_line_en": "Accreditation notice for a commercial laboratory; unrelated to duties."
  },
  "2026-21407": {
   "document_number": "2026-21407",
@@ -136,7 +142,8 @@
     "quote": "as a Commercial Gauger and Laboratory"
    }
   ],
-  "confidence": 0.95
+  "confidence": 0.95,
+  "one_line_en": "Accreditation notice for a commercial gauger and laboratory; unrelated to duties."
  },
  "2026-21406": {
   "document_number": "2026-21406",
@@ -153,7 +160,8 @@
     "quote": "as a Commercial Gauger and Laboratory"
    }
   ],
-  "confidence": 0.95
+  "confidence": 0.95,
+  "one_line_en": "Accreditation notice for a commercial gauger and laboratory; unrelated to duties."
  },
  "2026-21405": {
   "document_number": "2026-21405",
@@ -170,7 +178,8 @@
     "quote": "as a Commercial Gauger and Laboratory"
    }
   ],
-  "confidence": 0.95
+  "confidence": 0.95,
+  "one_line_en": "Accreditation notice for a commercial gauger and laboratory; unrelated to duties."
  },
  "2026-20884": {
   "document_number": "2026-20884",
@@ -187,7 +196,8 @@
     "quote": "Advance Traveler Information for Rail"
    }
   ],
-  "confidence": 0.9
+  "confidence": 0.9,
+  "one_line_en": "Proposed rule on advance traveler information for rail; unrelated to duties on goods."
  },
  "2026-20650": {
   "document_number": "2026-20650",
@@ -208,7 +218,8 @@
     "quote": "Low-Value Shipments"
    }
   ],
-  "confidence": 0.75
+  "confidence": 0.75,
+  "one_line_en": "CBP proposed rule on low-value shipments; may change how small parcels are declared and taxed; read the full text for details."
  },
  "2026-20615": {
   "document_number": "2026-20615",
@@ -225,7 +236,8 @@
     "quote": "Effect of the European Union's Carbon Border Adjustment Mechanism"
    }
   ],
-  "confidence": 0.85
+  "confidence": 0.85,
+  "one_line_en": "USTR seeks comments on how the EU carbon border adjustment mechanism affects U.S. trade; not about U.S. duties on Chinese goods."
  },
  "2026-20511": {
   "document_number": "2026-20511",
@@ -246,7 +258,8 @@
     "quote": "Notice of Conforming Amendment to Product Exclusion"
    }
   ],
-  "confidence": 0.85
+  "confidence": 0.85,
+  "one_line_en": "USTR makes a conforming amendment to one product exclusion under the China Section 301 action; read the full text for the tariff code."
  },
  "2026-20510": {
   "document_number": "2026-20510",
@@ -271,7 +284,8 @@
     "quote": "did not terminate on July 6, 2026"
    }
   ],
-  "confidence": 0.9
+  "confidence": 0.9,
+  "one_line_en": "The China technology-transfer Section 301 actions did not terminate on 2026-07-06 and remain in effect; the four-year review continues; no rate change."
  },
  "2026-20341": {
   "document_number": "2026-20341",
@@ -288,7 +302,8 @@
     "quote": "the United Mexican States, and Canada"
    }
   ],
-  "confidence": 0.85
+  "confidence": 0.85,
+  "one_line_en": "Request for comments and hearing on the operation of the USMCA; not about goods of Chinese origin."
  },
  "2026-20228": {
   "document_number": "2026-20228",
@@ -309,7 +324,8 @@
     "quote": "Court-Ordered Refunds Under the International Emergency Economic Powers Act Worksheet"
    }
   ],
-  "confidence": 0.85
+  "confidence": 0.85,
+  "one_line_en": "CBP information collection for the court-ordered IEEPA refund worksheet; relevant to refund claims for entered orders."
  },
  "2026-20229": {
   "document_number": "2026-20229",
@@ -326,7 +342,8 @@
     "quote": "Client Representative Technical Assistance Portal (CR-TAP)"
    }
   ],
-  "confidence": 0.9
+  "confidence": 0.9,
+  "one_line_en": "CBP information collection for the Client Representative Technical Assistance Portal; unrelated to duties."
  },
  "2026-20185": {
   "document_number": "2026-20185",
@@ -343,7 +360,8 @@
     "quote": "Immigration-Related Fees"
    }
   ],
-  "confidence": 0.95
+  "confidence": 0.95,
+  "one_line_en": "Inflation adjustment of DHS immigration-related fees; unrelated to duties on goods."
  },
  "2026-20171": {
   "document_number": "2026-20171",
@@ -360,7 +378,8 @@
     "quote": "Revision; Entry Summary"
    }
   ],
-  "confidence": 0.8
+  "confidence": 0.8,
+  "one_line_en": "Routine revision of the entry summary information collection; no rate change."
  },
  "2026-20170": {
   "document_number": "2026-20170",
@@ -377,7 +396,8 @@
     "quote": "Agency Information Collection Activities; Revision; Entry"
    }
   ],
-  "confidence": 0.8
+  "confidence": 0.8,
+  "one_line_en": "Routine revision of the entry information collection; no rate change."
  },
  "2026-22385": {
   "document_number": "2026-22385",
@@ -398,7 +418,8 @@
     "quote": "Imports Into U.S.; Adjustment (Proc. 11077)"
    }
   ],
-  "confidence": 0.7
+  "confidence": 0.7,
+  "one_line_en": "Presidential Proclamation 11077 adjusts imports of robotics, industrial machinery and their parts; read the full text to see whether duties are imposed."
  },
  "2026-22386": {
   "document_number": "2026-22386",
@@ -415,7 +436,8 @@
     "quote": "National Defense Authorization Act for Fiscal Year 2026"
    }
   ],
-  "confidence": 0.85
+  "confidence": 0.85,
+  "one_line_en": "Memorandum delegating authority under the National Defense Authorization Act; unrelated to duties."
  },
  "2026-22251": {
   "document_number": "2026-22251",
@@ -432,6 +454,7 @@
     "quote": "Performance Review Board Members"
    }
   ],
-  "confidence": 0.95
+  "confidence": 0.95,
+  "one_line_en": "List of USTR Performance Review Board members; unrelated to duties."
  }
 }
