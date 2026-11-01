@@ -2,7 +2,7 @@ import { t } from "@/i18n/runtime";
 import { currentLanguage } from "@/i18n/runtime";
 import type { components } from "./api-types";
 export type Schema<K extends keyof components["schemas"]> = components["schemas"][K];
-export const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://127.0.0.1:8000";
+export const API_BASE = process.env.NEXT_PUBLIC_API_BASE ?? "http://127.0.0.1:8000";
 export class ApiFailure extends Error {
   constructor(
     public status: number,
@@ -13,7 +13,10 @@ export class ApiFailure extends Error {
   }
 }
 export async function api<T>(path: string, init?: RequestInit): Promise<T> {
-  const url = new URL(`${API_BASE}/api${path}`);
+  const url = new URL(
+    `${API_BASE}/api${path}`,
+    typeof window === "undefined" ? "http://127.0.0.1:8000" : window.location.origin,
+  );
   url.searchParams.set("lang", currentLanguage());
   const response = await fetch(url, {
     ...init,
